@@ -130,30 +130,67 @@ elif st.session_state.quiz_stage == "taking":
         else:
             score = 0
             open_ended_notes = []
+            review_items = []
 
             for i, q in enumerate(data["questions"]):
                 qtype = q["type"]
 
                 if qtype == "mcq":
                     picked = st.session_state[f"q_{i}"]
-                    if q["options"].index(picked) == q["answer_index"]:
+                    is_correct = q["options"].index(picked) == q["answer_index"]
+                    if is_correct:
                         score += 1
+                    review_items.append({
+                        "question": q["question"],
+                        "your_answer": picked,
+                        "correct_answer": q["options"][q["answer_index"]],
+                        "status": "correct" if is_correct else "incorrect",
+                    })
 
                 elif qtype == "true_false":
-                    picked_bool = st.session_state[f"q_{i}"] == "True"
-                    if picked_bool == q["answer"]:
+                    picked = st.session_state[f"q_{i}"]
+                    is_correct = (picked == "True") == q["answer"]
+                    if is_correct:
                         score += 1
+                    review_items.append({
+                        "question": q["question"],
+                        "your_answer": picked,
+                        "correct_answer": "True" if q["answer"] else "False",
+                        "status": "correct" if is_correct else "incorrect",
+                    })
 
                 elif qtype == "short_answer":
-                    picked_text = st.session_state[f"q_{i}"].strip().lower()
-                    if picked_text in [a.lower() for a in q["accepted_answers"]]:
+                    picked_text = st.session_state[f"q_{i}"].strip()
+                    is_correct = picked_text.lower() in [a.lower() for a in q["accepted_answers"]]
+                    if is_correct:
                         score += 1
+                    review_items.append({
+                        "question": q["question"],
+                        "your_answer": picked_text,
+                        "correct_answer": " / ".join(q["accepted_answers"]),
+                        "status": "correct" if is_correct else "incorrect",
+                    })
 
                 elif qtype == "classify":
+                    sub_lines = []
+                    all_correct = True
                     for j, item in enumerate(q["items"]):
                         picked_cat = st.session_state[f"q_{i}_{j}"]
-                        if q["categories"].index(picked_cat) == item["answer_index"]:
+                        is_correct = q["categories"].index(picked_cat) == item["answer_index"]
+                        if is_correct:
                             score += 1
+                        else:
+                            all_correct = False
+                        icon = "✅" if is_correct else "❌"
+                        sub_lines.append(
+                            f"{icon} *{item['text']}* — you said **{picked_cat}**"
+                            + ("" if is_correct else f", correct is **{q['categories'][item['answer_index']]}**")
+                        )
+                    review_items.append({
+                        "question": q["question"],
+                        "sub_lines": sub_lines,
+                        "status": "correct" if all_correct else "incorrect",
+                    })
 
                 elif qtype == "open_ended":
                     answer_text = st.session_state[f"q_{i}"].strip()
@@ -161,10 +198,17 @@ elif st.session_state.quiz_stage == "taking":
                         f"Q{i + 1}: {q['question']}\nStudent answer: {answer_text}\n"
                         f"Model answer: {q['model_answer']}"
                     )
+                    review_items.append({
+                        "question": q["question"],
+                        "your_answer": answer_text,
+                        "correct_answer": q["model_answer"],
+                        "status": "review",
+                    })
 
             st.session_state.quiz_score = score
             st.session_state.quiz_total = total_points
             st.session_state.quiz_open_notes = "\n\n".join(open_ended_notes)
+            st.session_state.quiz_review = review_items
 
             if sheets_configured():
                 try:
@@ -203,14 +247,29 @@ elif st.session_state.quiz_stage == "result":
     else:
         st.warning("Not saved — the Google Sheet isn't connected.")
 
-    if st.session_state.get("quiz_open_notes"):
-        st.divider()
-        st.caption(
-            "Open-ended questions aren't auto-graded. Your teacher will review these; "
-            "here's the model answer for self-checking."
-        )
-        with st.expander("Review your open-ended answers"):
-            st.text(st.session_state.quiz_open_notes)
+    st.write("")
+    st.subheader("Review your answers")
+
+    status_labels = {"correct": "Correct", "incorrect": "Incorrect", "review": "Needs review"}
+
+    for i, item in enumerate(st.session_state.get("quiz_review", [])):
+        with st.container(border=True):
+            st.markdown(
+                f"{badge(status_labels[item['status']], item['status'])}",
+                unsafe_allow_html=True,
+            )
+            st.markdown(f"**Q{i + 1}.** {item['question']}")
+
+            if "sub_lines" in item:
+                for line in item["sub_lines"]:
+                    st.markdown(line)
+            elif item["status"] == "review":
+                st.markdown(f"Your answer: {item['your_answer']}")
+                st.caption(f"Model answer (for self-checking): {item['correct_answer']}")
+            else:
+                st.markdown(f"Your answer: **{item['your_answer']}**")
+                if item["status"] == "incorrect":
+                    st.markdown(f"Correct answer: **{item['correct_answer']}**")
 
     if st.button("Back to topics"):
         st.session_state.quiz_stage = "pick_topic"

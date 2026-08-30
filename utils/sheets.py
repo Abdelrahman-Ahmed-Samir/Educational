@@ -58,6 +58,15 @@ def _get_worksheet():
     except gspread.WorksheetNotFound:
         ws = spreadsheet.add_worksheet(title=worksheet_name, rows=1000, cols=len(HEADER))
         ws.append_row(HEADER)
+        return ws
+
+    # The worksheet already existed (e.g. created manually, or created before
+    # this check existed) — make sure row 1 is actually the expected header,
+    # inserting it above any existing data if it's missing or wrong.
+    first_row = ws.row_values(1)
+    if first_row != HEADER:
+        ws.insert_row(HEADER, index=1)
+
     return ws
 
 

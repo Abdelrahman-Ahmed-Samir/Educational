@@ -93,6 +93,9 @@ BADGE_COLORS = {
     "article": ("#D1FAE5", "#065F46"),
     "topic": ("#EEF2FF", "#4338CA"),
     "type": ("#F5F3FF", "#6C5CE7"),
+    "correct": ("#D1FAE5", "#065F46"),
+    "incorrect": ("#FEE2E2", "#991B1B"),
+    "review": ("#FEF3C7", "#92400E"),
 }
 
 
