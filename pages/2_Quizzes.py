@@ -12,18 +12,32 @@ from utils.ui import apply_theme, badge, render_header  # noqa: E402
 st.set_page_config(page_title="Quizzes", page_icon="📝")
 apply_theme()
 
-QUESTIONS_PATH = APP_DIR / "quizzes" / "questions.json"
+QUIZZES_DIR = APP_DIR / "quizzes"
 
 
 def load_questions():
-    with open(QUESTIONS_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+    """Load every quiz file in quizzes/, one .json file per topic.
+
+    Each file is self-contained: {"title": "...", "time_limit_minutes": N,
+    "questions": [...]}. The dict is keyed by each file's own "title", and
+    files are read in filename order — prefix filenames like 01_, 02_ to
+    control the order topics appear in.
+    """
+    quizzes = {}
+    for path in sorted(QUIZZES_DIR.glob("*.json")):
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        title = data.get("title", path.stem)
+        quizzes[title] = data
+    return quizzes
 
 
 def question_points(q: dict) -> int:
     """How many auto-gradable points a question is worth."""
     if q["type"] == "classify":
         return len(q["items"])
+    if q["type"] == "select_all":
+        return len(q["answer_indices"])
     if q["type"] == "open_ended":
         return 0
     return 1
@@ -74,6 +88,8 @@ elif st.session_state.quiz_stage == "taking":
             "mcq": ("Multiple choice", "type"),
             "true_false": ("True or false", "type"),
             "short_answer": ("Short answer", "type"),
+            "fill_blank": ("Fill in the blank", "type"),
+            "select_all": ("Select all that apply", "type"),
             "classify": ("Classify", "type"),
             "open_ended": ("Open ended", "type"),
         }
@@ -97,6 +113,15 @@ elif st.session_state.quiz_stage == "taking":
 
             elif q["type"] == "short_answer":
                 st.text_input("Your answer", key=f"q_{i}", label_visibility="collapsed")
+
+            elif q["type"] == "fill_blank":
+                st.text_input("Fill in the blank", key=f"q_{i}", label_visibility="collapsed")
+
+            elif q["type"] == "select_all":
+                st.multiselect(
+                    "Choose all that apply", q["options"], key=f"q_{i}",
+                    label_visibility="collapsed",
+                )
 
             elif q["type"] == "classify":
                 for j, item in enumerate(q["items"]):
@@ -122,7 +147,11 @@ elif st.session_state.quiz_stage == "taking":
                         missing = True
             else:
                 val = st.session_state.get(f"q_{i}")
-                if val is None or (isinstance(val, str) and not val.strip()):
+                if val is None:
+                    missing = True
+                elif isinstance(val, str) and not val.strip():
+                    missing = True
+                elif isinstance(val, list) and len(val) == 0:
                     missing = True
 
         if missing:
@@ -168,6 +197,33 @@ elif st.session_state.quiz_stage == "taking":
                         "question": q["question"],
                         "your_answer": picked_text,
                         "correct_answer": " / ".join(q["accepted_answers"]),
+                        "status": "correct" if is_correct else "incorrect",
+                    })
+
+                elif qtype == "fill_blank":
+                    picked_text = st.session_state[f"q_{i}"].strip()
+                    is_correct = picked_text.lower() in [a.lower() for a in q["accepted_answers"]]
+                    if is_correct:
+                        score += 1
+                    review_items.append({
+                        "question": q["question"],
+                        "your_answer": picked_text,
+                        "correct_answer": " / ".join(q["accepted_answers"]),
+                        "status": "correct" if is_correct else "incorrect",
+                    })
+
+                elif qtype == "select_all":
+                    picked_options = st.session_state[f"q_{i}"]
+                    picked_indices = {q["options"].index(opt) for opt in picked_options}
+                    correct_indices = set(q["answer_indices"])
+                    is_correct = picked_indices == correct_indices
+                    points = len(correct_indices)
+                    if is_correct:
+                        score += points
+                    review_items.append({
+                        "question": q["question"],
+                        "your_answer": ", ".join(picked_options) if picked_options else "No answer",
+                        "correct_answer": ", ".join(q["options"][idx] for idx in sorted(correct_indices)),
                         "status": "correct" if is_correct else "incorrect",
                     })
 

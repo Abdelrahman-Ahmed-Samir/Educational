@@ -12,7 +12,7 @@ pages/2_Quizzes.py         Topic list -> exam -> score
 pages/3_Grades.py          Teacher dashboard (reads the Google Sheet)
 resources/manifest.json    List of resources (edit this to add/remove items)
 resources/*.pdf            Small resource files you commit directly
-quizzes/questions.json     Question bank per topic (edit this to add quizzes)
+quizzes/*.json             One quiz file per topic (add a new file per quiz)
 utils/sheets.py            Google Sheets read/write helper
 ```
 
@@ -21,9 +21,36 @@ utils/sheets.py            Google Sheets read/write helper
 - **Resources**: drop small files (PDFs, Q&A docs) into `resources/`, then add
   an entry to `resources/manifest.json` with a `file` field. For videos or
   anything hosted elsewhere, use a `url` field instead of `file`.
-- **Quizzes**: edit `quizzes/questions.json`. Each topic is a key with a list
-  of questions, each question has `options` and the `answer_index` (0-based)
-  of the correct one.
+- **Quizzes**: each topic is its own file in `quizzes/`, e.g.
+  `quizzes/03_functions.json`. Prefix filenames with numbers (`01_`, `02_`,
+  `03_`...) to control the order they appear in — files load in filename
+  order. Each file looks like:
+
+  ```json
+  {
+    "title": "Functions",
+    "time_limit_minutes": 15,
+    "questions": [
+      {
+        "type": "mcq",
+        "question": "What keyword defines a function in Python?",
+        "options": ["func", "def", "function"],
+        "answer_index": 1
+      }
+    ]
+  }
+  ```
+
+  Supported question `type`s: `mcq`, `true_false`, `short_answer`,
+  `fill_blank` (same as `short_answer` — a text box checked against
+  `accepted_answers`, just phrased as filling in a blank), `select_all`
+  (checkbox-style: `options` + `answer_indices`, a list of the correct
+  option indices — full credit only if the student picks exactly that set,
+  no more, no less), `classify` (several sub-items each matched to a
+  category), and `open_ended` (not auto-graded — shown with a model answer
+  for the student to self-check, and flagged for the teacher to review
+  manually). See `quizzes/01_ai_ml_deep_learning.json` and
+  `quizzes/02_loops.json` for a worked example of every type.
 
 ## 2. Set up the Google Sheet (for grades)
 

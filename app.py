@@ -9,7 +9,7 @@ st.set_page_config(page_title=APP_NAME, page_icon=APP_ICON, layout="centered")
 apply_theme()
 
 RESOURCES_PATH = Path(__file__).parent / "resources" / "manifest.json"
-QUESTIONS_PATH = Path(__file__).parent / "quizzes" / "questions.json"
+QUIZZES_DIR = Path(__file__).parent / "quizzes"
 
 
 def load_json(path: Path):
@@ -17,14 +17,17 @@ def load_json(path: Path):
         return json.load(f)
 
 
+def count_quiz_topics():
+    return len(list(QUIZZES_DIR.glob("*.json")))
+
+
 render_header("Resources, Q&A docs and quizzes for your class, all in one place.")
 
 resources = load_json(RESOURCES_PATH)
-questions = load_json(QUESTIONS_PATH)
 
 col1, col2 = st.columns(2)
 col1.metric("Resources", len(resources))
-col2.metric("Quiz topics", len(questions))
+col2.metric("Quiz topics", count_quiz_topics())
 
 st.write("")
 st.subheader("Recently added")
