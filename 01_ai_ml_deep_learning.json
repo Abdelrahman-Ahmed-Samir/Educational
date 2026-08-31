@@ -1,0 +1,85 @@
+{
+  "title": "AI, ML, deep learning and generative AI",
+  "time_limit_minutes": 20,
+  "questions": [
+    {
+      "type": "short_answer",
+      "question": "What is the term for the advanced technology within machine learning that uses neural networks?",
+      "accepted_answers": [
+        "deep learning"
+      ]
+    },
+    {
+      "type": "short_answer",
+      "question": "What is the term for the AI technology that uses deep learning to generate new data?",
+      "accepted_answers": [
+        "generative ai"
+      ]
+    },
+    {
+      "type": "classify",
+      "question": "For each example (a-d), indicate which is most closely related: A Machine learning, B Deep learning, C Generative AI.",
+      "categories": [
+        "A Machine learning",
+        "B Deep learning",
+        "C Generative AI"
+      ],
+      "items": [
+        {
+          "text": "Automatically sorting spam emails.",
+          "answer_index": 0
+        },
+        {
+          "text": "Recognizing pedestrians on the road in autonomous driving.",
+          "answer_index": 1
+        },
+        {
+          "text": "Automatically generating new images from text.",
+          "answer_index": 2
+        },
+        {
+          "text": "Recommending products based on a user's purchase history.",
+          "answer_index": 0
+        }
+      ]
+    },
+    {
+      "type": "mcq",
+      "question": "From the following options, choose the one that correctly describes the relationship between AI, machine learning, deep learning, and generative AI.",
+      "options": [
+        "AI > Deep Learning > Machine Learning > Generative AI",
+        "Machine Learning > AI > Generative AI > Deep Learning",
+        "AI > Machine Learning > Deep Learning > Generative AI",
+        "Generative AI > Deep Learning > Machine Learning > AI"
+      ],
+      "answer_index": 2
+    },
+    {
+      "type": "mcq",
+      "question": "From the following options, choose the one that is NOT an appropriate example of generative AI.",
+      "options": [
+        "ChatGPT",
+        "Image generation AI",
+        "Spam filter",
+        "Audio generation AI"
+      ],
+      "answer_index": 2
+    },
+    {
+      "type": "true_false",
+      "question": "Generative AI can produce text that sounds plausible but is factually incorrect.",
+      "answer": true
+    },
+    {
+      "type": "open_ended",
+      "question": "Generative AI can produce text that sounds plausible but is factually incorrect (a \"hallucination\"). Explain why it is dangerous to use such output as the answer to a school report as-is, and state what learners should do instead.",
+      "model_answer": "It may contain incorrect information that sounds convincing. Learners should verify important information using reliable sources before using it."
+    },
+    {
+      "type": "open_ended",
+      "question": "Analyze the relationship between AI, machine learning, deep learning, and generative AI. In your answer: use the idea of nested categories, and give one example of each.",
+      "model_answer": "AI is the broad field; machine learning is within AI; deep learning is within machine learning; generative AI is a type of deep learning application. Example: AI - a chess-playing program; ML - a spam filter; deep learning - image recognition; generative AI - an image-generating tool."
+    }
+  ],
+  "max_attempts": 2
+}

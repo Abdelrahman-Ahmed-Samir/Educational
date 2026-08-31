@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Intro to loops",
+    "type": "video",
+    "topic": "Loops",
+    "url": "https://www.youtube.com/watch?v=REPLACE_ME"
+  },
+  {
+    "title": "Recursion cheatsheet",
+    "type": "pdf",
+    "topic": "Recursion",
+    "file": "recursion_cheatsheet.pdf"
+  },
+  {
+    "title": "Functions FAQ",
+    "type": "qa",
+    "topic": "Functions",
+    "file": "functions_faq.txt"
+  },
+  {
+    "title": "OOP basics walkthrough",
+    "type": "article",
+    "topic": "OOP",
+    "url": "https://REPLACE_ME.example.com/oop-basics"
+  }
+]
