@@ -1,6 +1,5 @@
 import json
 import sys
-import time
 from pathlib import Path
 
 import streamlit as st
@@ -9,11 +8,6 @@ APP_DIR = Path(__file__).parent.parent
 sys.path.append(str(APP_DIR))
 from utils.sheets import count_attempts, record_result, sheets_configured  # noqa: E402
 from utils.ui import apply_theme, badge, render_header  # noqa: E402
-
-try:
-    from streamlit_autorefresh import st_autorefresh
-except ImportError:
-    st_autorefresh = None
 
 st.set_page_config(page_title="Quizzes", page_icon="📝")
 apply_theme()
@@ -73,13 +67,7 @@ def is_answered(q: dict, i: int) -> bool:
 
 
 def finalize_quiz(topic: str, data: dict, total_points: int):
-    """Score whatever has been answered so far and move to the result stage.
-
-    Shared by the normal 'Submit exam' button and the auto-timeout path, so
-    a question left blank when time runs out is just graded as wrong
-    instead of crashing — this must never assume every question was
-    answered.
-    """
+    """Score whatever has been answered so far and move to the result stage."""
     score = 0
     open_ended_notes = []
     review_items = []
@@ -235,10 +223,6 @@ if st.session_state.quiz_stage == "pick_topic":
             st.session_state.quiz_topic = topic
             st.session_state.quiz_stage = "taking"
             st.session_state.quiz_student_name = student_name.strip()
-            st.session_state.quiz_start_time = time.time()
-            st.session_state.quiz_time_limit_seconds = (
-                questions_by_topic[topic]["time_limit_minutes"] * 60
-            )
             st.rerun()
 
 # ---- Stage 2: take the exam ----
@@ -247,25 +231,8 @@ elif st.session_state.quiz_stage == "taking":
     data = questions_by_topic[topic]
     total_points = sum(question_points(q) for q in data["questions"])
 
-    elapsed = time.time() - st.session_state.quiz_start_time
-    remaining = st.session_state.quiz_time_limit_seconds - elapsed
-
-    if remaining <= 0:
-        st.warning("Time's up! Submitting what you've answered so far.")
-        finalize_quiz(topic, data, total_points)
-        st.rerun()
-
     st.subheader(topic)
-    minutes, seconds = divmod(max(0, int(remaining)), 60)
-    timer_col, meta_col = st.columns([1, 2])
-    timer_col.metric("Time left", f"{minutes:02d}:{seconds:02d}")
-    meta_col.caption(f"{len(data['questions'])} questions · {total_points} auto-graded points")
-    st.progress(max(0.0, min(1.0, remaining / st.session_state.quiz_time_limit_seconds)))
-
-    if st_autorefresh is not None:
-        st_autorefresh(interval=1000, key="quiz_timer_tick")
-    else:
-        st.caption("Install `streamlit-autorefresh` for a live-ticking timer (see requirements.txt).")
+    st.caption(f"{len(data['questions'])} questions · {total_points} auto-graded points")
 
     with st.form("exam_form"):
         for i, q in enumerate(data["questions"]):
