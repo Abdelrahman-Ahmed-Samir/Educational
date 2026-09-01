@@ -8,7 +8,7 @@
   {
     "title": "Chapter-1-Question&Answer",
     "type": "PDF",
-    "topic": "Information_Technology_Society Teaching",
+    "topic": "Information_Technology_Society",
     "file": "Chapter_1_Information_Technology_and_Society_Questions_Answers.pdf"
   },
   {
@@ -16,5 +16,11 @@
     "type": "PowerPoint",
     "topic": "CyberSecurity Teaching",
     "file": "Chapter_2_Cybersecurity_Teaching.pptx"
+  },
+  {
+    "title": "Chapter-2-Question&Answer",
+    "type": "PDF",
+    "topic": "CyberSecurity",
+    "file": "Chapter_2_Cybersecurity_Questions_and_Answers.pdf"
   }
 ]
