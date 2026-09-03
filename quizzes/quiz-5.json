@@ -1,0 +1,105 @@
+{
+  "Cryptographic Technologies and Authentication": {
+    "time_limit_minutes": 20,
+    "questions": [
+      {
+        "type": "short_answer",
+        "question": "What is the cryptographic method used in HTTPS to safely share a key between the browser and the web server?",
+        "accepted_answers": [
+          "public-key cryptography"
+        ]
+      },
+      {
+        "type": "short_answer",
+        "question": "What is the cryptographic method used in HTTPS to encrypt the actual data after the common key has been shared?",
+        "accepted_answers": [
+          "common-key cryptography",
+          "symmetric-key cryptography"
+        ]
+      },
+      {
+        "type": "open_ended",
+        "question": "Read the following passage and answer each question. HTTPS communication, used to access websites safely, combines multiple cryptographic technologies. First, the web server sends a (a) and a public key to the browser. The browser verifies whether the server is authentic through (b). Next, the browser creates a (c) for communication and encrypts it with the server's public key before sending. After this, all data communication is encrypted using this (c). Fill in the blanks (a)–(c).",
+        "model_answer": "(a) digital certificate, (b) certificate authority (CA), (c) common key."
+      },
+      {
+        "type": "classify",
+        "question": "For each threat (a-d), indicate which technology is primarily used to address it: A Encryption, B Digital signature, C Digital certificate, D Multi-factor authentication.",
+        "categories": [
+          "A Encryption",
+          "B Digital signature",
+          "C Digital certificate",
+          "D Multi-factor authentication"
+        ],
+        "items": [
+          {
+            "text": "A password is leaked and unauthorized login occurs.",
+            "answer_index": 3
+          },
+          {
+            "text": "Data is altered during communication.",
+            "answer_index": 1
+          },
+          {
+            "text": "A user is led to a fake website.",
+            "answer_index": 2
+          },
+          {
+            "text": "Communication content is intercepted by a third party.",
+            "answer_index": 0
+          }
+        ]
+      },
+      {
+        "type": "mcq",
+        "question": "From the following options, choose the one that is NOT an appropriate example of multi-factor authentication.",
+        "options": [
+          "Password + smartphone notification",
+          "Password + secret question",
+          "Fingerprint authentication + smart card",
+          "Password + SMS authentication"
+        ],
+        "answer_index": 1
+      },
+      {
+        "type": "true_false",
+        "question": "Common-key cryptography is used for data communication in HTTPS because it can efficiently encrypt large amounts of data.",
+        "answer": true
+      },
+      {
+        "type": "true_false",
+        "question": "Using a password and a secret question is multi-factor authentication because two different pieces of information are used.",
+        "answer": false
+      },
+      {
+        "type": "mcq",
+        "question": "From the following options, choose the one that most appropriately describes why HTTPS combines public-key cryptography and common-key cryptography.",
+        "options": [
+          "Public-key cryptography provides safe key sharing, while common-key cryptography allows fast data communication.",
+          "Common-key cryptography is used to create digital certificates, while public-key cryptography detects viruses.",
+          "Public-key cryptography is always faster than common-key cryptography for large amounts of data.",
+          "The two methods are used only to improve the appearance of a website."
+        ],
+        "answer_index": 0
+      },
+      {
+        "type": "short_answer",
+        "question": "Name the three authentication factors introduced in the lesson.",
+        "accepted_answers": [
+          "knowledge, possession, biometric",
+          "knowledge, possession, and biometric"
+        ]
+      },
+      {
+        "type": "open_ended",
+        "question": "A student receives a message asking them to log in to a website that looks like their school's website. Explain how a digital certificate can help the student and identify one additional security technology that could protect the student's account.",
+        "model_answer": "A digital certificate can help verify that the website is authentic. Multi-factor authentication can provide additional protection by requiring another authentication factor even if the password is stolen."
+      },
+      {
+        "type": "open_ended",
+        "question": "Explain why using only one security technology is not enough to protect an online service.",
+        "model_answer": "Different security technologies address different threats. Encryption protects communication content, digital certificates verify the communication partner, digital signatures help detect tampering, and multi-factor authentication protects accounts from unauthorized login. Combining them provides stronger protection."
+      }
+    ]
+  }
+}

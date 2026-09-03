@@ -1,0 +1,114 @@
+{
+  "Network Security Design": {
+    "time_limit_minutes": 20,
+    "questions": [
+      {
+        "type": "short_answer",
+        "question": "What is the system installed at a network's entry/exit point that allows or denies communication based on preset rules?",
+        "accepted_answers": [
+          "firewall"
+        ]
+      },
+      {
+        "type": "short_answer",
+        "question": "What is the three-letter abbreviation for a technology that creates an encrypted virtual private line over the Internet?",
+        "accepted_answers": [
+          "VPN"
+        ]
+      },
+      {
+        "type": "short_answer",
+        "question": "What is the three-letter abbreviation for the zone where public-facing servers are separated from the internal network?",
+        "accepted_answers": [
+          "DMZ"
+        ]
+      },
+      {
+        "type": "open_ended",
+        "question": "Read the following passage and answer each question. To protect an organization's network, it is important to combine multiple security measures. First, a (a) is installed at the entry/exit point of the network to block unauthorized communication based on rules. Web servers and other servers exposed to the outside are placed in a (b), separated from the internal network. To connect safely from outside, such as with remote work, communication is encrypted using a (c). The concept of layering multiple measures in this way is called (d). Fill in the blanks (a)–(d).",
+        "model_answer": "(a) firewall, (b) DMZ, (c) VPN, (d) defense in depth."
+      },
+      {
+        "type": "mcq",
+        "question": "From the following options, choose the most appropriate reason for providing a DMZ.",
+        "options": [
+          "To improve communication speed.",
+          "To expose all servers to the outside.",
+          "To prevent damage to the internal network even if a public-facing server is attacked.",
+          "To automatically detect and remove viruses."
+        ],
+        "answer_index": 2
+      },
+      {
+        "type": "mcq",
+        "question": "From the following options, choose the one that most appropriately describes the concept of zero trust.",
+        "options": [
+          "Access from within the organization's network is safe, so verification is unnecessary.",
+          "A firewall alone is sufficient to protect the network.",
+          "No communication is trusted and is always verified.",
+          "Only access from outside needs to be monitored."
+        ],
+        "answer_index": 2
+      },
+      {
+        "type": "classify",
+        "question": "For each situation (a-d), indicate which security measure is most closely related: A Firewall, B VPN, C DMZ, D Endpoint protection.",
+        "categories": [
+          "A Firewall",
+          "B VPN",
+          "C DMZ",
+          "D Endpoint protection"
+        ],
+        "items": [
+          {
+            "text": "Blocking unauthorized network traffic according to preset rules.",
+            "answer_index": 0
+          },
+          {
+            "text": "Encrypting communication for an employee working remotely.",
+            "answer_index": 1
+          },
+          {
+            "text": "Separating a public-facing web server from the internal network.",
+            "answer_index": 2
+          },
+          {
+            "text": "Protecting an individual computer using antivirus software and system updates.",
+            "answer_index": 3
+          }
+        ]
+      },
+      {
+        "type": "true_false",
+        "question": "A firewall alone provides complete protection for an organization's network.",
+        "answer": false
+      },
+      {
+        "type": "true_false",
+        "question": "Defense in depth means using several layers of security so that one breached defense does not expose the whole network.",
+        "answer": true
+      },
+      {
+        "type": "mcq",
+        "question": "Which of the following is NOT an appropriate use of a VPN?",
+        "options": [
+          "Connecting safely from home to an organization's network.",
+          "Connecting different offices securely over the Internet.",
+          "Automatically detecting and removing malware from a computer.",
+          "Reducing the risk of eavesdropping on public Wi-Fi."
+        ],
+        "answer_index": 2
+      },
+      {
+        "type": "open_ended",
+        "question": "A company has a public website, employees who work from home, and confidential information stored on its internal network. Using defense in depth, suggest three security measures and explain where each one helps.",
+        "model_answer": "A firewall can control traffic entering and leaving the network. A DMZ can separate the public website from the internal network. A VPN can protect remote employees' communication. Endpoint protection can also protect individual devices."
+      },
+      {
+        "type": "open_ended",
+        "question": "A hospital moves its patient records to a cloud service and lets doctors access them from home. Using zero trust and defense in depth, suggest two measures it should apply and say where each one helps, then identify one risk that could still remain.",
+        "model_answer": "The hospital should verify every access rather than automatically trusting internal or remote users. It can also use encrypted communication such as a VPN and endpoint protection on doctors' devices. A remaining risk could be a compromised user account or device."
+      }
+    ]
+  }
+}
