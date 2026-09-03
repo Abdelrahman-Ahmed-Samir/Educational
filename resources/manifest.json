@@ -22,5 +22,11 @@
     "type": "PDF",
     "topic": "CyberSecurity",
     "file": "Chapter_2_Cybersecurity_Questions_and_Answers.pdf"
+  },
+  {
+    "title": "Chapter-3-Web_Applications_and_Frontend_Teaching",
+    "type": "PowerPoint",
+    "topic": "Web Applications-Frontend",
+    "file": "Chapter_3_Web_Applications_and_Frontend_Teaching.pptx"
   }
 ]
