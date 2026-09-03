@@ -1,5 +1,5 @@
 {
-  "Cryptographic Technologies and Authentication": {
+  "topic_title":"Cryptographic Technologies and Authentication",
     "time_limit_minutes": 20,
     "questions": [
       {
@@ -101,5 +101,4 @@
         "model_answer": "Different security technologies address different threats. Encryption protects communication content, digital certificates verify the communication partner, digital signatures help detect tampering, and multi-factor authentication protects accounts from unauthorized login. Combining them provides stronger protection."
       }
     ]
-  }
 }

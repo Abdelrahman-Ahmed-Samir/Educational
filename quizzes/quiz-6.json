@@ -1,5 +1,5 @@
 {
-  "Network Security Design": {
+  "topic_title":"Network Security Design",
     "time_limit_minutes": 20,
     "questions": [
       {
@@ -110,5 +110,4 @@
         "model_answer": "The hospital should verify every access rather than automatically trusting internal or remote users. It can also use encrypted communication such as a VPN and endpoint protection on doctors' devices. A remaining risk could be a compromised user account or device."
       }
     ]
-  }
 }
