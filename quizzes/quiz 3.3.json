@@ -5,7 +5,9 @@
     {
       "type": "short_answer",
       "question": "A web page is mainly built from three technologies. (a) defines the structure of the page, (b) specifies its appearance, and (c) adds behavior and interactivity. Fill in the blanks (a)–(c).",
-      "answer": "(a) HTML, (b) CSS, (c) JavaScript"
+      "accepted_answers": [
+        "(a) HTML, (b) CSS, (c) JavaScript"
+      ]
     },
     {
       "type": "true_false",
@@ -30,22 +32,37 @@
     {
       "type": "classify",
       "question": "For each task, indicate which technology is used: A HTML, B CSS, C JavaScript.",
-      "items": [
-        "a. Defining headings and paragraphs",
-        "b. Setting colors and fonts",
-        "c. Making a button respond to a click",
-        "d. Adding images and links",
-        "e. Controlling page layout",
-        "f. Updating part of the screen"
+      "categories": [
+        "A HTML",
+        "B CSS",
+        "C JavaScript"
       ],
-      "answer": {
-        "a": "A",
-        "b": "B",
-        "c": "C",
-        "d": "A",
-        "e": "B",
-        "f": "C"
-      }
+      "items": [
+        {
+          "text": "Defining headings and paragraphs",
+          "answer_index": 0
+        },
+        {
+          "text": "Setting colors and fonts",
+          "answer_index": 1
+        },
+        {
+          "text": "Making a button respond to a click",
+          "answer_index": 2
+        },
+        {
+          "text": "Adding images and links",
+          "answer_index": 0
+        },
+        {
+          "text": "Controlling page layout",
+          "answer_index": 1
+        },
+        {
+          "text": "Updating part of the screen",
+          "answer_index": 2
+        }
+      ]
     },
     {
       "type": "mcq",
@@ -56,7 +73,7 @@
         "Using JavaScript to add behavior",
         "Using HTTPS to encrypt communication"
       ],
-      "answer": "Using HTML element names that indicate the meaning of each part of the page"
+      "answer_index": 0
     },
     {
       "type": "mcq",
@@ -67,27 +84,35 @@
         "The display speed of a web page necessarily becomes faster",
         "Information can be easier to convey to users with visual impairments"
       ],
-      "answer": "The display speed of a web page necessarily becomes faster"
+      "answer_index": 2
     },
     {
       "type": "short_answer",
       "question": "What is accessibility?",
-      "answer": "The website being usable by people with impairments."
+      "accepted_answers": [
+        "The website being usable by people with impairments."
+      ]
     },
     {
       "type": "short_answer",
       "question": "What is SEO?",
-      "answer": "Helping search engines understand and find the content."
+      "accepted_answers": [
+        "Helping search engines understand and find the content."
+      ]
     },
     {
       "type": "short_answer",
       "question": "What is responsive design?",
-      "answer": "A design concept in which the layout automatically adjusts according to different screen sizes such as PCs, smartphones, and tablets."
+      "accepted_answers": [
+        "A design concept in which the layout automatically adjusts according to different screen sizes such as PCs, smartphones, and tablets."
+      ]
     },
     {
       "type": "short_answer",
       "question": "What is the mobile-first approach?",
-      "answer": "Starting by prioritizing smaller screens such as smartphones when designing the page."
+      "accepted_answers": [
+        "Starting by prioritizing smaller screens such as smartphones when designing the page."
+      ]
     },
     {
       "type": "mcq",
@@ -98,51 +123,55 @@
         "A technology for encrypting data and sending it safely",
         "A design concept for supporting different screen sizes"
       ],
-      "answer": "A structure for making web application development more efficient"
+      "answer_index": 1
     },
     {
       "type": "classify",
       "question": "Match each framework with its appropriate characteristic.",
-      "items": [
-        "a. Developed by Meta and suited to large-scale web applications",
-        "b. Has a simple structure and supports incremental construction",
-        "c. Adds mechanisms to speed up page display in addition to React features"
-      ],
       "categories": [
         "React",
         "Vue",
         "Next.js"
       ],
-      "answer": {
-        "a": "React",
-        "b": "Vue",
-        "c": "Next.js"
-      }
+      "items": [
+        {
+          "text": "Developed by Meta and suited to large-scale web applications",
+          "answer_index": 0
+        },
+        {
+          "text": "Has a simple structure and supports incremental construction",
+          "answer_index": 1
+        },
+        {
+          "text": "Adds mechanisms to speed up page display in addition to React features",
+          "answer_index": 2
+        }
+      ]
     },
     {
       "type": "open_ended",
       "question": "Think as an Engineer — A student club wants a simple web page that lists its events, is styled in the club's colors, and has a button showing how many people have signed up. Which technology handles each feature: HTML, CSS, or JavaScript? Explain.",
-      "answer": "HTML handles the event list because it defines the page structure and content. CSS handles the club's colors and layout because it specifies appearance. JavaScript handles the live sign-up counter because it adds behavior and updates the page."
+      "model_answer": "HTML handles the event list because it defines the page structure and content. CSS handles the club's colors and layout because it specifies appearance. JavaScript handles the live sign-up counter because it adds behavior and updates the page."
     },
     {
       "type": "open_ended",
       "question": "Think as an Engineer — Name one change that would make the student club page easier to read on a phone, and one semantic-HTML choice that would help a screen reader.",
-      "answer": "Use responsive design so the layout adjusts to the phone's screen size. Use meaningful semantic elements such as header, nav, main, or footer so a screen reader can better understand the page structure."
+      "model_answer": "Use responsive design so the layout adjusts to the phone's screen size. Use meaningful semantic elements such as header, nav, main, or footer so a screen reader can better understand the page structure."
     },
     {
       "type": "open_ended",
       "question": "Think as an Engineer — Recommend whether the student club should separate HTML, CSS, and JavaScript, and give two reasons.",
-      "answer": "Yes. HTML holds the content and structure, CSS controls the appearance, and JavaScript adds behavior. Separating their roles makes the page easier to understand, develop, and maintain."
+      "model_answer": "Yes. HTML holds the content and structure, CSS controls the appearance, and JavaScript adds behavior. Separating their roles makes the page easier to understand, develop, and maintain."
     },
     {
       "type": "open_ended",
       "question": "New Context — A news site must look good on phones and be found easily by search engines. Name one responsive-design choice and one semantic-HTML choice it should make, and say what each one improves.",
-      "answer": "Use a responsive layout that adjusts to different screen sizes to improve usability on phones. Use meaningful semantic elements such as header, nav, and main to improve accessibility and help search engines understand the content."
+      "model_answer": "Use a responsive layout that adjusts to different screen sizes to improve usability on phones. Use meaningful semantic elements such as header, nav, and main to improve accessibility and help search engines understand the content."
     },
     {
       "type": "open_ended",
       "question": "Reflect & Challenge — Of structure, style, and behavior, which do you notice most when a web page is badly made, and why?",
-      "answer": "Any of the three can be noticeable. Poor structure can make information confusing, poor style can make the page difficult to read, and poor behavior can make buttons or other interactions fail."
+      "model_answer": "Any of the three can be noticeable. Poor structure can make information confusing, poor style can make the page difficult to read, and poor behavior can make buttons or other interactions fail."
     }
   ]
 }
