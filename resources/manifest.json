@@ -26,7 +26,7 @@
   {
     "title": "Chapter-3-Web_Applications_and_Frontend_Teaching",
     "type": "PowerPoint",
-    "topic": "Web Applications-Frontend",
+    "topic": "Web Applications-Frontend Teaching",
     "file": "Chapter_3_Web_Applications_and_Frontend_Teaching.pptx"
   },
   {
@@ -34,5 +34,11 @@
     "type": "PDF",
     "topic": "Web Applications-Frontend",
     "file": "Chapter_3_Web_Applications_Questions_and_Answers.pdf"
+  },
+  {
+    "title": "Chapter_4_Web_and_Media_Design_Teaching",
+    "type": "PowerPoint",
+    "topic": "Web_and_Media_Design_Teaching",
+    "file": "Chapter_4_Web_and_Media_Design_Teaching_FULL_TEACHING.pptx"
   }
 ]
