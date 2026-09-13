@@ -43,7 +43,7 @@ APP_DIR = Path(__file__).parent.parent
 RESOURCES_DIR = APP_DIR / "resources"
 MANIFEST_PATH = RESOURCES_DIR / "manifest.json"
 
-EMBEDDING_MODEL = "models/gemini-embedding-001"
+EMBEDDING_MODEL = "models/gemini-embedding-2"
 CHAT_MODEL = "gemini-3.5-flash"
 CHUNK_SIZE = 1200
 CHUNK_OVERLAP = 150
