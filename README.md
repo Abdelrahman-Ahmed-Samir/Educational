@@ -90,16 +90,21 @@ Announcements show up in a panel at the top of the home page, newest first
 The Ask AI page lets students ask questions and get answers generated from
 the actual resource files in `resources/` (not a general-purpose chatbot) —
 useful for when you're not available to answer directly. It's
-retrieval-augmented: on first use, every resource file is read, chunked, and
-embedded; a question is matched against the most relevant chunks, which are
-then sent to Gemini along with the question. If the answer isn't in the
-resources, it's instructed to say so rather than guess, and cites which
-resource(s) it used.
+retrieval-augmented: every resource file is read, chunked, and embedded
+**locally** (via [fastembed](https://github.com/qdrant/fastembed), a small
+ONNX model — no API key, no account, no usage quota for this step); a
+question is matched against the most relevant chunks, which are then sent
+to Gemini along with the question. If the answer isn't in the resources,
+it's instructed to say so rather than guess, and cites which resource(s) it
+used.
 
-This runs on the **Gemini API**, not a locally-hosted model — Streamlit
-Community Cloud's free tier (~1GB RAM, no GPU) isn't enough to run even a
-small local LLM reliably, whereas Gemini's free tier comfortably covers
-classroom-scale traffic with no infrastructure to manage.
+Only the final answer-generation step calls an external API — the
+**Gemini API**, not a locally-hosted chat model, since Streamlit Community
+Cloud's free tier (~1GB RAM, no GPU) isn't enough to run even a small local
+LLM reliably, whereas Gemini's free tier comfortably covers classroom-scale
+chat traffic with no infrastructure to manage. Embeddings don't need this
+at all — they run entirely on your machine (or the app's container),
+offline.
 
 1. Get a free API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 2. Add it to `.streamlit/secrets.toml` (or Streamlit Cloud's Settings ->
@@ -112,24 +117,41 @@ classroom-scale traffic with no infrastructure to manage.
 
 3. That's it — the Ask AI page checks for this key and shows a setup message
    instead of erroring if it's missing, so the rest of the app works fine
-   without it.
+   without it. (This key is only used for the chat step; you don't need one
+   to build or use the resource embeddings.)
 
 Supported resource file types for indexing: `.pptx`, `.docx`, `.pdf`, `.txt`,
 `.md`. External `url` resources (videos, links) aren't indexed since there's
 no local file to read text from.
 
-**On persistence**: like resources and quizzes, the index is rebuilt from
-the files already in the repo every time the app process starts — there's
-nothing extra to deploy or keep in sync. It's cached in memory for the life
-of that process, so the first question after each restart takes a few
-seconds longer while it reads and embeds the resources; every question
-after that is fast.
+**On embeddings — build them offline, once**: resource embeddings are
+precomputed offline and committed to the repo as `resources/embeddings.npz`,
+rather than being (re-)computed every time the app process starts. Even
+though local embedding costs no quota, re-reading and re-embedding every
+resource file on every cold start (which happens often on Streamlit
+Community Cloud — redeploys, waking from sleep) still costs time and a
+one-time model download. With a precomputed file, startup just loads it
+directly.
 
-**On cost**: embeddings are computed once per app process (not per
-question), and each question costs one small chat call. At classroom scale
-this stays well within Gemini's free tier, but keep an eye on usage if the
-class grows or the app gets busy — see
-[ai.google.dev/pricing](https://ai.google.dev/pricing) for current limits.
+Whenever you add, remove, or edit a resource file, regenerate it locally
+and commit the result — no API key needed for this step:
+
+```bash
+python scripts/build_embeddings.py
+git add resources/embeddings.npz
+git commit -m "Rebuild resource embeddings"
+```
+
+The app checks the committed file against a hash of `resources/manifest.json`
+and the embedding model name, and falls back to embedding live (still
+local, still free, just slower to start) if the file is missing or out of
+date — so nothing breaks if you forget this step.
+
+**On cost**: embeddings are local and free. Each student question costs one
+small Gemini chat call. At classroom scale this stays well within Gemini's
+free tier, but keep an eye on usage if the class grows or the app gets
+busy — see [ai.google.dev/pricing](https://ai.google.dev/pricing) for
+current limits.
 
 ## 4. Set up the Google Sheet (for grades)
 
@@ -218,8 +240,10 @@ streamlit run app.py
   they survive Streamlit Cloud restarts, sleeps, and redeploys.
 - Grades live in Google Sheets, so they're safe regardless of what happens to
   the app container.
-- The Ask AI assistant's resource index is rebuilt in memory from the repo
-  files each time the app process starts (see "Set up the AI assistant"
-  above) — nothing to keep in sync separately.
+- The Ask AI assistant's resource index is loaded from the precomputed
+  `resources/embeddings.npz` each time the app process starts (see "Set up
+  the AI assistant" above). Remember to run `scripts/build_embeddings.py`
+  and commit the result whenever resources change. This step needs no API
+  key — embeddings run locally.
 - To add or update resources/quizzes/announcements later, edit the files and
   push to GitHub — Streamlit Cloud redeploys automatically.
