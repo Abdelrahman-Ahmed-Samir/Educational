@@ -2,4 +2,4 @@
 __pycache__/
 *.pyc
 .venv/
-.cache/
+.cache/resource_embeddings.json
