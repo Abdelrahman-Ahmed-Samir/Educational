@@ -1,0 +1,146 @@
+{
+  "topic": "3-2 Web Application Communication Methods",
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "type": "short_answer",
+      "question": "A web application operates by communication between a (a), which requests data or processing from the server, and a (b), which receives the request, processes it, and returns a response. This communication uses a protocol called (c). The protocol that adds SSL/TLS encryption to (c) is called (d). Fill in the blanks (a)–(d).",
+      "answer": "(a) Client, (b) Server, (c) HTTP, (d) HTTPS"
+    },
+    {
+      "type": "true_false",
+      "question": "The client requests data or processing from the server.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "HTTPS adds SSL/TLS encryption to HTTP.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "GET is used to send data to the server.",
+      "answer": false
+    },
+    {
+      "type": "true_false",
+      "question": "A server receives requests, processes them, and returns responses.",
+      "answer": true
+    },
+    {
+      "type": "classify",
+      "question": "For each operation, indicate which HTTP method is used: A GET, B POST.",
+      "items": [
+        "a. Displaying a web page",
+        "b. Entering an ID and password into a login form and submitting them",
+        "c. Displaying search results",
+        "d. Submitting the contents of a contact form"
+      ],
+      "answer": {
+        "a": "A",
+        "b": "B",
+        "c": "A",
+        "d": "B"
+      }
+    },
+    {
+      "type": "mcq",
+      "question": "From the following options, choose the one that most appropriately describes HTTPS.",
+      "options": [
+        "A method for retrieving data from the server",
+        "A system for exchanging data between different pieces of software",
+        "A communication protocol that adds SSL/TLS encryption to HTTP",
+        "A status code indicating that a problem has occurred on the server side"
+      ],
+      "answer": "A communication protocol that adds SSL/TLS encryption to HTTP"
+    },
+    {
+      "type": "mcq",
+      "question": "Which status code indicates that the request was processed successfully?",
+      "options": [
+        "200",
+        "404",
+        "500",
+        "301"
+      ],
+      "answer": "200"
+    },
+    {
+      "type": "mcq",
+      "question": "Which status code indicates that the requested page or URL does not exist?",
+      "options": [
+        "200",
+        "404",
+        "500",
+        "403"
+      ],
+      "answer": "404"
+    },
+    {
+      "type": "mcq",
+      "question": "Which status code indicates that a problem has occurred on the server side?",
+      "options": [
+        "200",
+        "301",
+        "404",
+        "500"
+      ],
+      "answer": "500"
+    },
+    {
+      "type": "short_answer",
+      "question": "What is an API?",
+      "answer": "A system for exchanging data between different pieces of software."
+    },
+    {
+      "type": "short_answer",
+      "question": "What does JSON stand for?",
+      "answer": "JavaScript Object Notation."
+    },
+    {
+      "type": "short_answer",
+      "question": "Why is JSON useful for web applications?",
+      "answer": "It is a data format that is easy for humans to read and for computers to process."
+    },
+    {
+      "type": "classify",
+      "question": "Match each description with the correct term.",
+      "items": [
+        "a. Protocol for exchanging data between clients and servers",
+        "b. System for exchanging data between different pieces of software",
+        "c. HTTP with added encryption",
+        "d. Retrieve data from the server",
+        "e. Send data to the server"
+      ],
+      "categories": [
+        "HTTP",
+        "API",
+        "HTTPS",
+        "GET",
+        "POST"
+      ],
+      "answer": {
+        "a": "HTTP",
+        "b": "API",
+        "c": "HTTPS",
+        "d": "GET",
+        "e": "POST"
+      }
+    },
+    {
+      "type": "open_ended",
+      "question": "Think as an Engineer — A school web application lets students log in, view their timetable, and download a PDF. Choose GET or POST for loading grade history, submitting the login form, and requesting today's schedule from another school system. Explain your choices.",
+      "answer": "GET is appropriate for loading grade history and requesting today's schedule because these operations retrieve data. POST is appropriate for submitting the login form because it sends data to the server."
+    },
+    {
+      "type": "open_ended",
+      "question": "Think as an Engineer — Should the school login use HTTP or HTTPS? Why?",
+      "answer": "HTTPS should be used because it adds SSL/TLS encryption to HTTP and reduces the risk of communication content being read by third parties."
+    },
+    {
+      "type": "open_ended",
+      "question": "Reflect & Challenge — When a page fails to load, which status code would help you understand why, and what would it tell you?",
+      "answer": "404 indicates that the requested page or URL was not found. A 500 status code indicates that a problem occurred on the server side."
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "topic_title": "Development of Information Technology and Social Transformation",
+  "time_limit_minutes": 1,
+  "questions": [
+    {
+      "type": "short_answer",
+      "question": "What became widespread in the 1970s and 1980s and allowed individuals to use computers?",
+      "accepted_answers": ["personal computers", "PCs", "personal computer"]
+    },
+    {
+      "type": "short_answer",
+      "question": "What technology was commercialized in the 1990s and advanced the globalization of information?",
+      "accepted_answers": ["the Internet", "Internet"]
+    },
+    {
+      "type": "short_answer",
+      "question": "What technology emerged in the 2000s and led to the explosive spread of mobile Internet?",
+      "accepted_answers": ["smartphones", "smartphone"]
+    },
+    {
+      "type": "short_answer",
+      "question": "What technology supports large-scale data analysis and the use of AI?",
+      "accepted_answers": ["cloud computing"]
+    },
+    {
+      "type": "mcq",
+      "question": "From the following options, choose the one that most appropriately describes SNS.",
+      "options": [
+        "A service for buying and selling goods and services through the Internet.",
+        "A service that allows users to connect with each other and post and share information.",
+        "A working style in which people work from home.",
+        "A system for making payments without using cash."
+      ],
+      "answer_index": 1
+    },
+    {
+      "type": "mcq",
+      "question": "From the following options, choose the correct chronological order.",
+      "options": [
+        "Computers > Smartphones > Internet/Web > Cloud computing",
+        "Computers > Internet/Web > Smartphones > Cloud computing",
+        "Internet/Web > Computers > Smartphones > Cloud computing",
+        "Smartphones > Computers > Internet/Web > Cloud computing"
+      ],
+      "answer_index": 1
+    },
+    {
+      "type": "mcq",
+      "question": "According to Moore's Law, approximately how often does the number of transistors on an integrated circuit double?",
+      "options": [
+        "Every two months",
+        "Every two years",
+        "Every ten years",
+        "Every twenty years"
+      ],
+      "answer_index": 1
+    },
+    {
+      "type": "mcq",
+      "question": "Which of the following is NOT an example of an emerging technology?",
+      "options": [
+        "Autonomous driving",
+        "AR",
+        "VR",
+        "Email"
+      ],
+      "answer_index": 3
+    },
+    {
+      "type": "true_false",
+      "question": "E-commerce means buying and selling goods and services through the Internet.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "Remote work means working from home or another location using the Internet.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "Cashless payment requires people to use physical cash.",
+      "answer": false
+    },
+    {
+      "type": "true_false",
+      "question": "Cloud computing provides IT services through the Internet.",
+      "answer": true
+    },
+    {
+      "type": "classify",
+      "question": "For each example (a-c), indicate which technology is most closely related: A Autonomous driving, B AR, C VR.",
+      "categories": [
+        "A Autonomous driving",
+        "B AR",
+        "C VR"
+      ],
+      "items": [
+        {
+          "text": "Uses AI to drive a vehicle without human operation.",
+          "answer_index": 0
+        },
+        {
+          "text": "Overlays digital information on the real world.",
+          "answer_index": 1
+        },
+        {
+          "text": "Allows users to immerse themselves in a computer-generated virtual space.",
+          "answer_index": 2
+        }
+      ]
+    },
+    {
+      "type": "open_ended",
+      "question": "A village gets high-speed Internet and cashless payment for the first time. Predict two changes that might occur in daily life and one new problem that might appear.",
+      "model_answer": "Possible changes include easier access to online services, online learning, communication, e-commerce, and cashless payment. A possible problem is that people without suitable devices, accounts, or digital skills may have difficulty using the new services."
+    },
+    {
+      "type": "open_ended",
+      "question": "A community is considering moving toward cashless payment. Recommend one approach and give two reasons for your recommendation.",
+      "model_answer": "The community could introduce cashless payment gradually while continuing to accept cash. This provides convenience and efficiency while reducing the risk of excluding people who cannot use digital payment."
+    },
+    {
+      "type": "open_ended",
+      "question": "Analyze how the development of information technology has changed society. Refer to at least three areas such as communication, work, learning, buying and selling, payment, and access to information.",
+      "model_answer": "Information technology has changed communication by making information sharing faster, changed work through remote work, changed learning through online education, changed shopping through e-commerce, changed payment through cashless systems, and made information more easily accessible."
+    }
+  ]
+}
