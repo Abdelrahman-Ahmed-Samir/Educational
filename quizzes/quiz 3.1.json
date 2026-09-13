@@ -1,11 +1,13 @@
 {
-  "topic": "3-1 The Overall Structure of Web Applications",
+  "topic_title": "3-1 The Overall Structure of Web Applications",
   "time_limit_minutes": 15,
   "questions": [
     {
       "type": "short_answer",
       "question": "A web application is composed of three tiers. The screen component that users see directly is the (a). Server-side processing that users do not see is the (b). A system that stores, organizes, and manages data is the (c). Fill in the blanks (a)–(c).",
-      "answer": "(a) Frontend, (b) Backend, (c) Database"
+      "accepted_answers": [
+        "(a) Frontend, (b) Backend, (c) Database"
+      ]
     },
     {
       "type": "true_false",
@@ -25,22 +27,37 @@
     {
       "type": "classify",
       "question": "For each item, indicate which tier it belongs to: A Frontend, B Backend, C Database.",
-      "items": [
-        "a. Product listing page",
-        "b. Searching for matching products",
-        "c. Storing user information",
-        "d. Search screen",
-        "e. Checking login authentication",
-        "f. Storing order history"
+      "categories": [
+        "A Frontend",
+        "B Backend",
+        "C Database"
       ],
-      "answer": {
-        "a": "A",
-        "b": "B",
-        "c": "C",
-        "d": "A",
-        "e": "B",
-        "f": "C"
-      }
+      "items": [
+        {
+          "text": "Product listing page",
+          "answer_index": 0
+        },
+        {
+          "text": "Searching for matching products",
+          "answer_index": 1
+        },
+        {
+          "text": "Storing user information",
+          "answer_index": 2
+        },
+        {
+          "text": "Search screen",
+          "answer_index": 0
+        },
+        {
+          "text": "Checking login authentication",
+          "answer_index": 1
+        },
+        {
+          "text": "Storing order history",
+          "answer_index": 2
+        }
+      ]
     },
     {
       "type": "mcq",
@@ -51,17 +68,19 @@
         "Server-side processing that users do not see",
         "A system that makes decisions about stored data"
       ],
-      "answer": "The screen component users see and interact with directly"
+      "answer_index": 1
     },
     {
       "type": "short_answer",
       "question": "A user searches for a product. Complete the flow: The frontend receives the search keywords and sends them to the (a). The backend searches the (b). The database returns matching data. The backend organizes the result and the frontend (c) the result.",
-      "answer": "(a) Backend, (b) Database, (c) Displays/shows"
+      "accepted_answers": [
+        "(a) Backend, (b) Database, (c) Displays/shows"
+      ]
     },
     {
       "type": "open_ended",
       "question": "Explain how the frontend, backend, and database cooperate when a user searches for a product.",
-      "answer": "The frontend receives the search keywords and sends them to the backend. The backend searches the database. The database returns matching data to the backend. The backend organizes the result and sends it to the frontend, which displays the result."
+      "model_answer": "The frontend receives the search keywords and sends them to the backend. The backend searches the database. The database returns matching data to the backend. The backend organizes the result and sends it to the frontend, which displays the result."
     },
     {
       "type": "mcq",
@@ -72,22 +91,22 @@
         "Organizing, storing, and managing data",
         "Displaying the web page in the browser"
       ],
-      "answer": "Organizing, storing, and managing data"
+      "answer_index": 2
     },
     {
       "type": "open_ended",
       "question": "Think as an Engineer — A clinic wants a web application where patients can book appointments, check available time slots, and view their past visits. Which tier should handle each task, and why?",
-      "answer": "The frontend handles the booking screen and user input. The backend processes the booking request and checks available slots. The database stores and retrieves appointment and visit information."
+      "model_answer": "The frontend handles the booking screen and user input. The backend processes the booking request and checks available slots. The database stores and retrieves appointment and visit information."
     },
     {
       "type": "open_ended",
       "question": "New Context — A weather application allows users to enter a city and view weather information. Using the three-tier architecture, describe what the frontend, backend, and database could do.",
-      "answer": "The frontend collects the city name and displays the weather. The backend processes the request and obtains the required weather data. The database can store and retrieve relevant information such as user or historical weather data."
+      "model_answer": "The frontend collects the city name and displays the weather. The backend processes the request and obtains the required weather data. The database can store and retrieve relevant information such as user or historical weather data."
     },
     {
       "type": "open_ended",
       "question": "Reflect & Challenge — Why must the frontend, backend, and database cooperate instead of performing all tasks in one part of the application?",
-      "answer": "Each tier has a different responsibility. Separating them makes the application easier to understand, develop, maintain, and troubleshoot."
+      "model_answer": "Each tier has a different responsibility. Separating them makes the application easier to understand, develop, maintain, and troubleshoot."
     }
   ]
 }
