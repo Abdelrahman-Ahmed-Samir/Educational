@@ -73,12 +73,12 @@ except ImportError:
     TextEmbedding = None
 
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"  # local, via fastembed — no API key
-CHAT_MODEL = "gemini-2.5-flash"
-TOP_K = 5
+CHAT_MODEL = "gemini-3.5-flash"
+TOP_K = 10
 
 
 SYSTEM_INSTRUCTION = (
-    "You are a helpful teaching assistant for a programming class. Answer "
+    "You are a helpful teaching assistant called (Little Champo) for a programming class. Answer "
     "the student's question using ONLY the excerpts from the class "
     "resources provided below — do not use outside knowledge, and do not "
     "guess. If the excerpts don't contain the answer, say plainly that "
