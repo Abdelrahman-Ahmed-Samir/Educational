@@ -3,21 +3,48 @@
     "title": "Chapter-1",
     "type": "PowerPoint",
     "topic": "Information_Technology_Society Teaching",
-    "file": "Chapter_1_Information_Technology_and_Society_Teaching.pptx",
-    "date_added": "2026-08-01"
+    "file": "Chapter_1_Information_Technology_and_Society_Teaching.pptx"
   },
   {
     "title": "Chapter-1-Question&Answer",
     "type": "PDF",
-    "topic": "Information_Technology_Society Teaching",
-    "file": "Chapter_1_Information_Technology_and_Society_Questions_Answers.pdf",
-    "date_added": "2026-08-01"
+    "topic": "Information_Technology_Society",
+    "file": "Chapter_1_Information_Technology_and_Society_Questions_Answers.pdf"
   },
   {
     "title": "Chapter-2",
     "type": "PowerPoint",
     "topic": "CyberSecurity Teaching",
-    "file": "Chapter_2_Cybersecurity_Teaching.pptx",
-    "date_added": "2026-09-10"
+    "file": "Chapter_2_Cybersecurity_Teaching.pptx"
+  },
+  {
+    "title": "Chapter-2-Question&Answer",
+    "type": "PDF",
+    "topic": "CyberSecurity",
+    "file": "Chapter_2_Cybersecurity_Questions_and_Answers.pdf"
+  },
+  {
+    "title": "Chapter-3-Web_Applications_and_Frontend_Teaching",
+    "type": "PowerPoint",
+    "topic": "Web Applications-Frontend Teaching",
+    "file": "Chapter_3_Web_Applications_and_Frontend_Teaching.pptx"
+  },
+  {
+    "title": "Chapter-3-Web_Applications_and_Frontend-Question&Answer",
+    "type": "PDF",
+    "topic": "Web Applications-Frontend",
+    "file": "Chapter_3_Web_Applications_Questions_and_Answers.pdf"
+  },
+  {
+    "title": "Chapter_4_Web_and_Media_Design_Teaching",
+    "type": "PowerPoint",
+    "topic": "Web_and_Media_Design_Teaching",
+    "file": "Chapter_4_Web_and_Media_Design_Teaching_FULL_TEACHING.pptx"
+  },
+  {
+    "title": "Chapter_4_Web_and_Media_Design-Question&Answer",
+    "type": "PDF",
+    "topic": "Web_and_Media_Design",
+    "file": "Chapter_4_Web_and_Media_Design_Questions_and_Answers.pdf"
   }
 ]
