@@ -1,0 +1,100 @@
+{
+  "topic_title": "Chapter 4 - Lesson 4-2 - Information Design and User Experience for Websites",
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "type": "true_false",
+      "question": "A persona is a typical user image set up as a concrete person.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "A wireframe is the final decorated visual design of a website.",
+      "answer": false
+    },
+    {
+      "type": "true_false",
+      "question": "Proximity means placing related information close together so it is perceived as a group.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "User-Centered Design prioritizes the creator's convenience over the user's needs.",
+      "answer": false
+    },
+    {
+      "type": "short_answer",
+      "question": "What is the term for a typical user represented as a concrete person?",
+      "accepted_answers": [
+        "persona"
+      ]
+    },
+    {
+      "type": "short_answer",
+      "question": "What is the term for a blueprint used to determine the placement and priority of information?",
+      "accepted_answers": [
+        "wireframe"
+      ]
+    },
+    {
+      "type": "classify",
+      "question": "Match each description with the correct CRAP principle: A Contrast, B Repetition, C Alignment, D Proximity.",
+      "categories": [
+        "A Contrast",
+        "B Repetition",
+        "C Alignment",
+        "D Proximity"
+      ],
+      "items": [
+        {
+          "text": "Highlight important information so it stands out.",
+          "answer_index": 0
+        },
+        {
+          "text": "Repeat styles to create consistency.",
+          "answer_index": 1
+        },
+        {
+          "text": "Align elements to create order.",
+          "answer_index": 2
+        },
+        {
+          "text": "Group related information close together.",
+          "answer_index": 3
+        }
+      ]
+    },
+    {
+      "type": "mcq",
+      "question": "Which of the following is NOT one of the CRAP principles?",
+      "options": [
+        "Contrast",
+        "Encryption",
+        "Alignment",
+        "Proximity"
+      ],
+      "answer_index": 1
+    },
+    {
+      "type": "mcq",
+      "question": "Which best describes User-Centered Design (UCD)?",
+      "options": [
+        "Design mainly for developer convenience.",
+        "Choose visual design before understanding users.",
+        "Begin from what the user needs and the situation in which the site will be used.",
+        "Always use the newest web technologies."
+      ],
+      "answer_index": 2
+    },
+    {
+      "type": "open_ended",
+      "question": "Explain why a designer creates a persona and a wireframe before choosing colors and fonts.",
+      "model_answer": "A persona keeps the design focused on a concrete user's needs. A wireframe determines the placement and priority of information before visual preferences, making discussion and agreement with stakeholders easier."
+    },
+    {
+      "type": "open_ended",
+      "question": "A school results page is cluttered and parents cannot quickly find grades. Suggest one persona, one wireframe decision, and one CRAP principle that could improve the page.",
+      "model_answer": "The persona could be a parent checking a child's grades. The wireframe could place grades in a high-priority block. Contrast could be used to make the grades stand out, or proximity could group related results."
+    }
+  ]
+}
