@@ -1,5 +1,6 @@
 import json
 import sys
+import time
 from pathlib import Path
 
 import streamlit as st
@@ -7,7 +8,12 @@ import streamlit as st
 APP_DIR = Path(__file__).parent.parent
 sys.path.append(str(APP_DIR))
 from utils.sheets import count_attempts, record_result, sheets_configured  # noqa: E402
-from utils.ui import apply_theme, badge, render_header  # noqa: E402
+from utils.ui import apply_theme, badge, render_header, timer_banner  # noqa: E402
+
+try:
+    from streamlit_autorefresh import st_autorefresh
+except ImportError:
+    st_autorefresh = None
 
 st.set_page_config(page_title="Quizzes", page_icon="📝")
 apply_theme()
@@ -28,18 +34,22 @@ TYPE_LABELS = {
 def load_questions():
     """Load every quiz file in quizzes/, one .json file per topic.
 
-    Each file is self-contained: {"title": "...", "time_limit_minutes": N,
-    "questions": [...], "max_attempts": N (optional)}. Keyed by each file's
-    own "title"; files are read in filename order — prefix with 01_, 02_
-    etc. to control the order topics appear in.
+    Each file is self-contained: {"title" (or legacy "topic_title"): "...",
+    "time_limit_minutes": N, "questions": [...], "max_attempts": N (optional)}.
+    Keyed by each file's own title; files are read in filename order.
     """
     quizzes = {}
     for path in sorted(QUIZZES_DIR.glob("*.json")):
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        title = data.get("title", path.stem)
+        title = data.get("title") or data.get("topic_title") or path.stem
         quizzes[title] = data
     return quizzes
+
+
+def clear_quiz_answers():
+    for key in [k for k in list(st.session_state.keys()) if k.startswith("q_")]:
+        del st.session_state[key]
 
 
 def question_points(q: dict) -> int:
@@ -66,8 +76,22 @@ def is_answered(q: dict, i: int) -> bool:
     return True
 
 
-def finalize_quiz(topic: str, data: dict, total_points: int):
-    """Score whatever has been answered so far and move to the result stage."""
+def safe_index(options: list, value) -> int:
+    """Index lookup that never raises — returns -1 when missing so an
+    auto-submit (partial answers, stale widget state) can't crash scoring
+    and leave the exam stuck on the timer page."""
+    try:
+        return options.index(value)
+    except (ValueError, AttributeError):
+        return -1
+
+
+def finalize_quiz(topic: str, data: dict, total_points: int, timed_out: bool = False):
+    """Score whatever has been answered so far and move to the result stage.
+
+    Always ends on the result stage (never stays on the exam page), even if
+    an individual question has unexpected data.
+    """
     score = 0
     open_ended_notes = []
     review_items = []
@@ -77,7 +101,8 @@ def finalize_quiz(topic: str, data: dict, total_points: int):
 
         if qtype == "mcq":
             picked = st.session_state.get(f"q_{i}")
-            is_correct = picked is not None and q["options"].index(picked) == q["answer_index"]
+            picked_idx = safe_index(q.get("options", []), picked) if picked is not None else -1
+            is_correct = picked_idx != -1 and picked_idx == q["answer_index"]
             if is_correct:
                 score += 1
             review_items.append({
@@ -113,7 +138,11 @@ def finalize_quiz(topic: str, data: dict, total_points: int):
 
         elif qtype == "select_all":
             picked_options = st.session_state.get(f"q_{i}") or []
-            picked_indices = {q["options"].index(opt) for opt in picked_options}
+            picked_indices = set()
+            for opt in picked_options:
+                idx = safe_index(q.get("options", []), opt)
+                if idx != -1:
+                    picked_indices.add(idx)
             correct_indices = set(q["answer_indices"])
             is_correct = picked_indices == correct_indices
             if is_correct:
@@ -130,7 +159,8 @@ def finalize_quiz(topic: str, data: dict, total_points: int):
             all_correct = True
             for j, item in enumerate(q["items"]):
                 picked_cat = st.session_state.get(f"q_{i}_{j}")
-                is_correct = picked_cat is not None and q["categories"].index(picked_cat) == item["answer_index"]
+                picked_idx = safe_index(q.get("categories", []), picked_cat) if picked_cat is not None else -1
+                is_correct = picked_idx != -1 and picked_idx == item["answer_index"]
                 if is_correct:
                     score += 1
                 else:
@@ -163,6 +193,13 @@ def finalize_quiz(topic: str, data: dict, total_points: int):
     st.session_state.quiz_total = total_points
     st.session_state.quiz_open_notes = "\n\n".join(open_ended_notes)
     st.session_state.quiz_review = review_items
+    st.session_state.quiz_timed_out = timed_out
+    st.session_state.quiz_completed = True
+    st.session_state.pop("balloons_shown", None)
+    # Stop the timer once submitted — deadline keys removed so a stale
+    # autorefresh tick can never re-arm the countdown.
+    for _k in ("quiz_start_ts", "quiz_deadline_ts", "quiz_time_limit_min", "quiz_ticker"):
+        st.session_state.pop(_k, None)
 
     if sheets_configured():
         try:
@@ -183,12 +220,36 @@ def finalize_quiz(topic: str, data: dict, total_points: int):
     st.session_state.quiz_stage = "result"
 
 
+def render_review_items(review_items: list) -> None:
+    """Student-facing answer review: every question with YOUR answer and
+    the CORRECT answer side by side. Reused on the result screen and in
+    the 'review last attempt' expander on the quiz list."""
+    status_labels = {"correct": "Correct", "incorrect": "Incorrect", "review": "Needs review"}
+    for i, item in enumerate(review_items or []):
+        with st.container(border=True):
+            st.markdown(
+                f"{badge(status_labels.get(item.get('status', ''), 'review'), item.get('status', 'review'))}",
+                unsafe_allow_html=True,
+            )
+            st.markdown(f"**Q{i + 1}.** {item.get('question', '')}")
+
+            if "sub_lines" in item:
+                for line in item["sub_lines"]:
+                    st.markdown(line)
+            elif item.get("status") == "review":
+                st.markdown(f"✏️ Your answer: {item.get('your_answer', '')}")
+                st.caption(f"Model answer (for self-checking): {item.get('correct_answer', '')}")
+            else:
+                st.markdown(f"✏️ Your answer: **{item.get('your_answer', '')}**")
+                st.markdown(f"✅ Correct answer: **{item.get('correct_answer', '')}**")
+
+
 questions_by_topic = load_questions()
 
 if "quiz_stage" not in st.session_state:
     st.session_state.quiz_stage = "pick_topic"
 
-render_header("Pick a topic, take the exam, and your score is saved automatically.")
+render_header("Pick a topic, beat the timer ⏰, and your score is saved automatically! 🎉")
 
 if not sheets_configured():
     st.info(
@@ -199,10 +260,31 @@ if not sheets_configured():
 
 # ---- Stage 1: pick a topic ----
 if st.session_state.quiz_stage == "pick_topic":
+    # If the student just finished a quiz, keep their grade visible here too,
+    # so it's never lost even if they leave the result screen.
+    if st.session_state.get("quiz_completed") and st.session_state.get("quiz_score") is not None:
+        _last_total = st.session_state.get("quiz_total") or 0
+        _last_pct = (st.session_state.get("quiz_score", 0) / _last_total * 100) if _last_total else 0
+        st.success(
+            f"Last attempt ({st.session_state.get('quiz_topic', 'quiz')}): "
+            f"{st.session_state.get('quiz_score')}/{_last_total} ({_last_pct:.0f}%) — "
+            "press 'Start exam' for a new try or review it on the Grades page.",
+            icon="✅",
+        )
+        if st.session_state.get("quiz_review"):
+            with st.expander("📖 Review my last answers (your answer vs correct answer)"):
+                render_review_items(st.session_state.get("quiz_review", []))
     student_name = st.text_input("Your name", key="student_name")
     topic = st.selectbox("Topic", list(questions_by_topic.keys()))
 
-    max_attempts = questions_by_topic[topic].get("max_attempts")
+    _preview = questions_by_topic[topic]
+    _limit = _preview.get("time_limit_minutes")
+    if _limit:
+        st.caption(f"⏰ Time limit: {_limit} minute(s) — the exam auto-submits when time runs out!")
+    else:
+        st.caption("🌈 No time limit — take your time and have fun!")
+
+    max_attempts = _preview.get("max_attempts")
     attempts_used = 0
     limit_reached = False
     if max_attempts and sheets_configured() and student_name.strip():
@@ -216,26 +298,74 @@ if st.session_state.quiz_stage == "pick_topic":
         else:
             st.caption(f"Attempt {attempts_used + 1} of {max_attempts}.")
 
-    if st.button("Start exam", type="primary", disabled=limit_reached):
+    if st.button("Start exam 🚀", type="primary", disabled=limit_reached):
         if not student_name.strip():
             st.error("Enter your name first.")
         else:
+            clear_quiz_answers()
+            for _k in ("quiz_ticker", "quiz_timed_out"):
+                st.session_state.pop(_k, None)
+            limit_min = questions_by_topic[topic].get("time_limit_minutes")
             st.session_state.quiz_topic = topic
             st.session_state.quiz_stage = "taking"
             st.session_state.quiz_student_name = student_name.strip()
+            st.session_state.quiz_time_limit_min = limit_min
+            now = time.time()
+            st.session_state.quiz_start_ts = now
+            try:
+                total_sec = int(float(limit_min) * 60) if limit_min else 0
+            except (TypeError, ValueError):
+                total_sec = 0
+            st.session_state.quiz_deadline_ts = now + total_sec if total_sec > 0 else None
+            st.session_state.quiz_timed_out = False
             st.rerun()
 
-# ---- Stage 2: take the exam ----
+# ---- Stage 2: take the exam (with countdown timer) ----
 elif st.session_state.quiz_stage == "taking":
-    topic = st.session_state.quiz_topic
+    topic = st.session_state.get("quiz_topic")
+    if not topic or topic not in questions_by_topic:
+        # Stale session (e.g. app restarted mid-exam): back to the list
+        # instead of crashing.
+        st.warning("That exam session is no longer available — please pick the topic again.")
+        st.session_state.quiz_stage = "pick_topic"
+        st.rerun()
     data = questions_by_topic[topic]
     total_points = sum(question_points(q) for q in data["questions"])
+    time_limit = st.session_state.get("quiz_time_limit_min") or data.get("time_limit_minutes")
 
-    st.subheader(topic)
+    st.subheader(f"🎯 {topic}")
     st.caption(f"{len(data['questions'])} questions · {total_points} auto-graded points")
 
-    with st.form("exam_form"):
-        for i, q in enumerate(data["questions"]):
+    # Countdown: refresh every second, auto-submit at zero, then LEAVE
+    # the exam page (goes to result — never restarts the timer in place).
+    if time_limit:
+        try:
+            total_sec = int(float(time_limit) * 60)
+        except (TypeError, ValueError):
+            total_sec = 0
+        if total_sec > 0:
+            deadline = st.session_state.get("quiz_deadline_ts")
+            if deadline is None:
+                # Old session from before the deadline fix, or state was
+                # cleared mid-exam: don't silently restart the clock —
+                # send the student back to the quiz list to start fresh.
+                st.warning("⏰ This exam session expired. Please start the exam again.")
+                st.session_state.quiz_stage = "pick_topic"
+                st.rerun()
+            if st_autorefresh is not None:
+                st_autorefresh(interval=1000, key="quiz_ticker")
+            remaining = int(deadline - time.time())
+            if remaining <= 0:
+                st.warning("⏰ Time's up! Submitting what you've got…")
+                finalize_quiz(topic, data, total_points, timed_out=True)
+                st.rerun()
+            timer_banner(remaining, total_sec)
+            st.caption(f"⏰ {time_limit} minute(s) total · auto-submits at 00:00, then shows your score!")
+    else:
+        st.caption("🌈 No timer for this one — relax and do your best!")
+
+    for i, q in enumerate(data["questions"]):
+        with st.container(border=True):
             label = TYPE_LABELS.get(q["type"], "")
             st.markdown(f"{badge(label, 'type')}", unsafe_allow_html=True)
             st.write(f"**Q{i + 1}.** {q['question']}")
@@ -275,28 +405,73 @@ elif st.session_state.quiz_stage == "taking":
             elif q["type"] == "open_ended":
                 st.text_area("Your answer", key=f"q_{i}", label_visibility="collapsed")
 
-            st.write("")
+    st.write("")
+    answered = sum(1 for i, q in enumerate(data["questions"]) if is_answered(q, i))
+    st.caption(f"📝 Answered {answered}/{len(data['questions'])} — keep going! 🌟")
 
-        submitted = st.form_submit_button("Submit exam", type="primary")
+    col_submit, col_back = st.columns(2)
+    with col_submit:
+        submitted = st.button("Submit exam ✅", type="primary", use_container_width=True)
+    with col_back:
+        back = st.button("Back to topics", use_container_width=True)
 
     if submitted:
         missing = any(not is_answered(q, i) for i, q in enumerate(data["questions"]))
         if missing:
-            st.error("Answer every question before submitting.")
+            st.error("Answer every question before submitting — or wait for the timer to auto-submit!")
         else:
             finalize_quiz(topic, data, total_points)
             st.rerun()
 
-    if st.button("Back to topics"):
+    if back:
+        for _k in ("quiz_start_ts", "quiz_deadline_ts", "quiz_time_limit_min", "quiz_ticker", "quiz_timed_out"):
+            st.session_state.pop(_k, None)
+        clear_quiz_answers()
         st.session_state.quiz_stage = "pick_topic"
         st.rerun()
 
-# ---- Stage 3: result ----
+# ---- Stage 3: result — final grade shown big to the student ----
+# NOTE: this stage never navigates away on its own. No autorefresh, no
+# auto-redirect — the student stays here until they press "Back to quizzes".
 elif st.session_state.quiz_stage == "result":
-    score = st.session_state.quiz_score
-    total = st.session_state.quiz_total
+    if st.session_state.get("quiz_timed_out"):
+        st.warning("⏰ Time's up! Your answers were auto-submitted.", icon="⏰")
+    score = st.session_state.get("quiz_score")
+    total = st.session_state.get("quiz_total")
+    if score is None or total is None:
+        st.error("No submitted result found — please take the quiz again.")
+        if st.button("🏠 Back to quizzes", use_container_width=True):
+            st.session_state.quiz_stage = "pick_topic"
+            st.rerun()
+        st.stop()
+    pct = (score / total * 100) if total else 0
+
+    if pct >= 90:
+        grade, emoji, msg = "A", "🌟", "Outstanding! You're a superstar!"
+    elif pct >= 80:
+        grade, emoji, msg = "B", "🎉", "Great job! Keep it up!"
+    elif pct >= 70:
+        grade, emoji, msg = "C", "👍", "Good effort — a little review and you'll ace it!"
+    elif pct >= 60:
+        grade, emoji, msg = "D", "💪", "You passed — keep practicing!"
+    else:
+        grade, emoji, msg = "F", "📚", "Don't give up — review the resources and try again!"
+
     st.caption(f"Submitted by {st.session_state.get('quiz_student_name', 'you')}")
-    st.metric("Auto-graded score", f"{score}/{total}")
+    with st.container(border=True):
+        st.markdown(f"## {emoji} Final Grade: {grade} ({pct:.0f}%)")
+        st.caption(msg)
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Score", f"{score}/{total}")
+        c2.metric("Percent", f"{pct:.0f}%")
+        c3.metric("Grade", grade)
+        st.progress(max(0.0, min(1.0, pct / 100)))
+    if pct >= 80 and not st.session_state.get("balloons_shown"):
+        st.balloons()
+        st.session_state.balloons_shown = True
+    has_open = any(it.get("status") == "review" for it in st.session_state.get("quiz_review", []))
+    if has_open:
+        st.caption("ℹ️ Includes only auto-graded questions — open-ended answers need teacher review.")
 
     if st.session_state.get("quiz_synced"):
         st.success("Synced to the Google Sheet.", icon="✅")
@@ -306,29 +481,17 @@ elif st.session_state.quiz_stage == "result":
         st.warning("Not saved — the Google Sheet isn't connected.")
 
     st.write("")
-    st.subheader("Review your answers")
+    st.subheader("📖 Review your answers")
+    _rev = st.session_state.get("quiz_review", [])
+    _n_ok = sum(1 for it in _rev if it.get("status") == "correct")
+    _n_bad = sum(1 for it in _rev if it.get("status") == "incorrect")
+    _n_rev = sum(1 for it in _rev if it.get("status") == "review")
+    st.caption(f"✅ {_n_ok} correct · ❌ {_n_bad} wrong · 📝 {_n_rev} for teacher review")
+    render_review_items(_rev)
 
-    status_labels = {"correct": "Correct", "incorrect": "Incorrect", "review": "Needs review"}
-
-    for i, item in enumerate(st.session_state.get("quiz_review", [])):
-        with st.container(border=True):
-            st.markdown(
-                f"{badge(status_labels[item['status']], item['status'])}",
-                unsafe_allow_html=True,
-            )
-            st.markdown(f"**Q{i + 1}.** {item['question']}")
-
-            if "sub_lines" in item:
-                for line in item["sub_lines"]:
-                    st.markdown(line)
-            elif item["status"] == "review":
-                st.markdown(f"Your answer: {item['your_answer']}")
-                st.caption(f"Model answer (for self-checking): {item['correct_answer']}")
-            else:
-                st.markdown(f"Your answer: **{item['your_answer']}**")
-                if item["status"] == "incorrect":
-                    st.markdown(f"Correct answer: **{item['correct_answer']}**")
-
-    if st.button("Back to topics"):
+    if st.button("🏠 Back to quizzes", use_container_width=True):
+        for _k in ("quiz_start_ts", "quiz_deadline_ts", "quiz_time_limit_min", "quiz_ticker", "quiz_timed_out"):
+            st.session_state.pop(_k, None)
+        clear_quiz_answers()
         st.session_state.quiz_stage = "pick_topic"
         st.rerun()

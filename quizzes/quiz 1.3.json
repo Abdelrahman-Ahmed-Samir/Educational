@@ -1,0 +1,157 @@
+{
+  "topic_title": "AI in Daily Life and Industry",
+  "time_limit_minutes": 20,
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "Which AI service predicts a user's preferences from past behavior and displays recommendations?",
+      "options": [
+        "Voice assistant",
+        "Recommendation system",
+        "Machine translation",
+        "Face recognition"
+      ],
+      "answer_index": 1
+    },
+    {
+      "type": "mcq",
+      "question": "Which AI technology recognizes a voice, understands commands, and executes them?",
+      "options": [
+        "Voice assistant",
+        "Recommendation system",
+        "Face recognition",
+        "Predictive maintenance"
+      ],
+      "answer_index": 0
+    },
+    {
+      "type": "mcq",
+      "question": "A smartphone automatically detects a person's face to unlock the phone. Which technology is being used?",
+      "options": [
+        "Machine translation",
+        "Recommendation system",
+        "Face recognition",
+        "Predictive maintenance"
+      ],
+      "answer_index": 2
+    },
+    {
+      "type": "mcq",
+      "question": "Which industry commonly uses AI to detect diseases from X-ray and CT images?",
+      "options": [
+        "Agriculture",
+        "Healthcare",
+        "Logistics",
+        "Manufacturing"
+      ],
+      "answer_index": 1
+    },
+    {
+      "type": "mcq",
+      "question": "Which AI application is most closely related to logistics?",
+      "options": [
+        "Detecting diseases from X-ray images",
+        "Predicting harvest timing",
+        "Optimizing delivery routes",
+        "Product quality inspection"
+      ],
+      "answer_index": 2
+    },
+    {
+      "type": "classify",
+      "question": "For each example (a-d), indicate which AI service is being used: A Recommendation system, B Voice assistant, C Machine translation, D Face recognition.",
+      "categories": [
+        "A Recommendation system",
+        "B Voice assistant",
+        "C Machine translation",
+        "D Face recognition"
+      ],
+      "items": [
+        {
+          "text": "YouTube recommends videos based on your preferences.",
+          "answer_index": 0
+        },
+        {
+          "text": "Speaking to a smartphone to check the weather.",
+          "answer_index": 1
+        },
+        {
+          "text": "Translating a foreign-language website.",
+          "answer_index": 2
+        },
+        {
+          "text": "A smartphone camera detects a person's face.",
+          "answer_index": 3
+        }
+      ]
+    },
+    {
+      "type": "classify",
+      "question": "For each application (a-d), indicate which industry is most closely related: A Healthcare, B Agriculture, C Manufacturing, D Logistics.",
+      "categories": [
+        "A Healthcare",
+        "B Agriculture",
+        "C Manufacturing",
+        "D Logistics"
+      ],
+      "items": [
+        {
+          "text": "Optimizing delivery routes.",
+          "answer_index": 3
+        },
+        {
+          "text": "Detecting diseases from X-ray images.",
+          "answer_index": 0
+        },
+        {
+          "text": "Detecting pests and diseases in crops.",
+          "answer_index": 1
+        },
+        {
+          "text": "Automating product quality inspection.",
+          "answer_index": 2
+        }
+      ]
+    },
+    {
+      "type": "true_false",
+      "question": "AI can identify patterns that humans might miss.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "AI should always make the final ethical decision.",
+      "answer": false
+    },
+    {
+      "type": "true_false",
+      "question": "Biased training data can cause inaccurate or unfair AI judgments.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "Privacy is an important issue when AI uses personal information.",
+      "answer": true
+    },
+    {
+      "type": "open_ended",
+      "question": "A hospital uses AI to examine X-ray images. Explain why the doctor should still check the AI's result.",
+      "model_answer": "AI can make incorrect predictions or miss important information. A doctor should verify the result, consider the patient's situation, and make the final responsible decision."
+    },
+    {
+      "type": "open_ended",
+      "question": "A school library uses students' borrowing history to recommend books. Explain how the recommendation system could work and identify one privacy concern.",
+      "model_answer": "The system can analyze previous borrowing behavior and predict which books a student may prefer. A privacy concern is that students' personal behavior and data are being collected and analyzed."
+    },
+    {
+      "type": "open_ended",
+      "question": "Choose one industry where AI is used. Describe one benefit of using AI, one possible concern, and explain whether a human should check the AI's result.",
+      "model_answer": "Answers may vary. For example, in healthcare, AI can help detect diseases from medical images. A concern is that AI may make an incorrect judgment, so a doctor should check the result and make the final decision."
+    },
+    {
+      "type": "open_ended",
+      "question": "Analyze why AI is well suited to some tasks but requires caution in others. Refer to AI's strengths in patterns, recognition, and prediction, and to caution around ethics, privacy, bias, and final responsibility.",
+      "model_answer": "AI is strong at finding patterns, recognizing information, and making predictions from data. However, caution is needed when decisions involve ethics, privacy, biased data, or responsibility because AI can make mistakes and cannot automatically take human responsibility."
+    }
+  ]
+}

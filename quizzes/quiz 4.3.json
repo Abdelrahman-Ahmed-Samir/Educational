@@ -1,0 +1,119 @@
+{
+  "topic_title": "Chapter 4 - Lesson 4-3 - Methods for Evaluating Websites",
+  "time_limit_minutes": 15,
+  "questions": [
+    {
+      "type": "true_false",
+      "question": "Qualitative evaluation mainly uses numerical data to understand how much something is happening.",
+      "answer": false
+    },
+    {
+      "type": "true_false",
+      "question": "PV represents the number of times a page has been viewed.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "Bounce rate is the proportion of visits that ended after viewing only the first page.",
+      "answer": true
+    },
+    {
+      "type": "true_false",
+      "question": "Heuristic evaluation uses experts who identify UI problems using rules of thumb.",
+      "answer": true
+    },
+    {
+      "type": "short_answer",
+      "question": "What type of evaluation helps explain why a website problem occurs?",
+      "accepted_answers": [
+        "qualitative",
+        "qualitative evaluation"
+      ]
+    },
+    {
+      "type": "short_answer",
+      "question": "What does PV stand for?",
+      "accepted_answers": [
+        "page view",
+        "page views",
+        "pv"
+      ]
+    },
+    {
+      "type": "classify",
+      "question": "For each method, choose A Qualitative or B Quantitative.",
+      "categories": [
+        "A Qualitative",
+        "B Quantitative"
+      ],
+      "items": [
+        {
+          "text": "Users explore the website and their usability is observed.",
+          "answer_index": 0
+        },
+        {
+          "text": "Access counts and page views are tallied.",
+          "answer_index": 1
+        },
+        {
+          "text": "Users are interviewed about their impressions and improvement requests.",
+          "answer_index": 0
+        },
+        {
+          "text": "Numerical website data is analyzed to understand overall trends.",
+          "answer_index": 1
+        }
+      ]
+    },
+    {
+      "type": "classify",
+      "question": "Match each description with the correct indicator: A PV, B Bounce rate, C CVR.",
+      "categories": [
+        "A PV",
+        "B Bounce rate",
+        "C CVR"
+      ],
+      "items": [
+        {
+          "text": "Total number of times a page has been viewed.",
+          "answer_index": 0
+        },
+        {
+          "text": "Proportion of visits ending after the first page.",
+          "answer_index": 1
+        },
+        {
+          "text": "Proportion of visits achieving a target action such as purchase or registration.",
+          "answer_index": 2
+        }
+      ]
+    },
+    {
+      "type": "mcq",
+      "question": "Which most appropriately describes heuristic evaluation?",
+      "options": [
+        "Users explore the site and usability is observed.",
+        "Numerical data is tallied.",
+        "Experts identify UI problems based on rules of thumb.",
+        "Two patterns are prepared and compared using data."
+      ],
+      "answer_index": 2
+    },
+    {
+      "type": "mcq",
+      "question": "An online bookstore has high PV but very low CVR. What does this most likely indicate?",
+      "options": [
+        "Few people are visiting the website.",
+        "Many people visit, but few take the target action.",
+        "The website has no pages.",
+        "All visitors complete a purchase."
+      ],
+      "answer_index": 1
+    },
+    {
+      "type": "open_ended",
+      "question": "A school website gets many visits, but most users leave after the first page. Name one quantitative indicator, one qualitative method to find the cause, and one possible improvement.",
+      "model_answer": "The bounce rate is a suitable quantitative indicator. Usability testing or interviews can help find the cause. A possible improvement would be to improve the first-page information or navigation based on the findings."
+    }
+  ]
+}

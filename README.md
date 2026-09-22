@@ -87,37 +87,49 @@ Announcements show up in a panel at the top of the home page, newest first
 
 ## 3. Set up the AI assistant (Ask AI page)
 
-The Ask AI page lets students ask questions and get answers generated from
-the actual resource files in `resources/` (not a general-purpose chatbot) —
-useful for when you're not available to answer directly. It's
-retrieval-augmented: every resource file is read, chunked, and embedded
-**locally** (via [fastembed](https://github.com/qdrant/fastembed), a small
-ONNX model — no API key, no account, no usage quota for this step); a
-question is matched against the most relevant chunks, which are then sent
-to Gemini along with the question. If the answer isn't in the resources,
-it's instructed to say so rather than guess, and cites which resource(s) it
-used.
+The Ask AI page lets students ask questions — in English or Arabic — and get
+answers generated from the actual resource files in `resources/` (not a
+general-purpose chatbot) — useful for when you're not available to answer
+directly. It's retrieval-augmented: every resource file is read, chunked,
+and embedded **locally** (via [fastembed](https://github.com/qdrant/fastembed),
+a small ~130MB ONNX model — no API key, no account, no usage quota for this
+step); a question is matched against the most relevant chunks, which are
+then sent to the chat model along with the question. If the answer isn't in
+the resources, it's instructed to say so rather than guess, and names only
+the resource(s) it actually used.
 
-Only the final answer-generation step calls an external API — the
-**Gemini API**, not a locally-hosted chat model, since Streamlit Community
-Cloud's free tier (~1GB RAM, no GPU) isn't enough to run even a small local
-LLM reliably, whereas Gemini's free tier comfortably covers classroom-scale
-chat traffic with no infrastructure to manage. Embeddings don't need this
-at all — they run entirely on your machine (or the app's container),
-offline.
+Arabic questions are translated to English for the retrieval step only (the
+embedding model is English-only — keeping it small is what lets the app fit
+Streamlit Cloud's ~1GB RAM), then answered in Arabic.
 
-1. Get a free API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
+Only the final answer-generation step calls an external API — **Gemini
+first, with Groq as automatic fallback**, not locally-hosted chat models,
+since Streamlit Community Cloud's free tier (~1GB RAM, no GPU) isn't enough
+to run even a small local LLM reliably. Both free tiers comfortably cover
+classroom-scale chat traffic with no infrastructure to manage. Embeddings
+don't need this at all — they run entirely on your machine (or the app's
+container), offline.
+
+1. Get a free API key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+   (Gemini) and/or [console.groq.com/keys](https://console.groq.com/keys) (Groq).
+   One is enough; both gives you failover.
 2. Add it to `.streamlit/secrets.toml` (or Streamlit Cloud's Settings ->
    Secrets):
 
    ```toml
    [gemini]
    api_key = "your-gemini-api-key"
+
+   [groq]
+   api_key = "your-groq-api-key"
    ```
 
-3. That's it — the Ask AI page checks for this key and shows a setup message
-   instead of erroring if it's missing, so the rest of the app works fine
-   without it. (This key is only used for the chat step; you don't need one
+   Optional model overrides under `[ai]` (`gemini_model`, `groq_model`) —
+   see `secrets.toml.example`.
+
+3. That's it — the Ask AI page checks for keys and shows a setup message
+   instead of erroring if they're missing, so the rest of the app works fine
+   without them. (Keys are only used for the chat step; you don't need one
    to build or use the resource embeddings.)
 
 Supported resource file types for indexing: `.pptx`, `.docx`, `.pdf`, `.txt`,
@@ -148,10 +160,11 @@ local, still free, just slower to start) if the file is missing or out of
 date — so nothing breaks if you forget this step.
 
 **On cost**: embeddings are local and free. Each student question costs one
-small Gemini chat call. At classroom scale this stays well within Gemini's
-free tier, but keep an eye on usage if the class grows or the app gets
-busy — see [ai.google.dev/pricing](https://ai.google.dev/pricing) for
-current limits.
+small chat call (two if asked in Arabic — one to translate the question for
+retrieval, one to answer). At classroom scale this stays well within the
+free tiers, but keep an eye on usage if the class grows — see
+[ai.google.dev/pricing](https://ai.google.dev/pricing) and Groq's limits page
+for current quotas.
 
 ## 4. Set up the Google Sheet (for grades)
 

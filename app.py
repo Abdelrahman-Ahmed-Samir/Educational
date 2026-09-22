@@ -11,6 +11,7 @@ apply_theme()
 
 RESOURCES_PATH = Path(__file__).parent / "resources" / "manifest.json"
 QUIZZES_DIR = Path(__file__).parent / "quizzes"
+ACTIVITIES_PATH = Path(__file__).parent / "activities" / "manifest.json"
 
 
 def load_json(path: Path):
@@ -22,7 +23,7 @@ def count_quiz_topics():
     return len(list(QUIZZES_DIR.glob("*.json")))
 
 
-render_header("Resources, Q&A docs and quizzes for your class, all in one place.")
+render_header("Learn, practice and play — resources, activities, quizzes and AI help! 🎒")
 
 announcements = get_announcements(limit=5)
 if announcements:
@@ -39,10 +40,15 @@ if announcements:
     st.write("")
 
 resources = load_json(RESOURCES_PATH)
+try:
+    activities = load_json(ACTIVITIES_PATH)
+except Exception:
+    activities = []
 
-col1, col2 = st.columns(2)
-col1.metric("Resources", len(resources))
-col2.metric("Quiz topics", count_quiz_topics())
+col1, col2, col3 = st.columns(3)
+col1.metric("📚 Resources", len(resources))
+col2.metric("🎯 Activities", len(activities))
+col3.metric("📝 Quiz topics", count_quiz_topics())
 
 st.write("")
 st.subheader("Recently added")
@@ -55,8 +61,8 @@ for r in resources[:3]:
         )
 
 st.write("")
-st.subheader("Jump in")
-c1, c2, c3, c4 = st.columns(4)
+st.subheader("Jump in 🚀")
+c1, c2, c3, c4, c5 = st.columns(5)
 with c1:
     with st.container(border=True):
         st.markdown("### 📚")
@@ -65,17 +71,23 @@ with c1:
         st.page_link("pages/1_Library.py", label="Open", icon="➡️")
 with c2:
     with st.container(border=True):
+        st.markdown("### 🎯")
+        st.write("**Activities**")
+        st.caption("Fun tasks & assessments")
+        st.page_link("pages/5_Activities.py", label="Open", icon="➡️")
+with c3:
+    with st.container(border=True):
         st.markdown("### 📝")
         st.write("**Quizzes**")
         st.caption("Take a topic exam")
         st.page_link("pages/2_Quizzes.py", label="Open", icon="➡️")
-with c3:
+with c4:
     with st.container(border=True):
         st.markdown("### 📊")
         st.write("**Grades**")
         st.caption("Teacher results dashboard")
         st.page_link("pages/3_Grades.py", label="Open", icon="➡️")
-with c4:
+with c5:
     with st.container(border=True):
         st.markdown("### 🤖")
         st.write("**Ask AI**")

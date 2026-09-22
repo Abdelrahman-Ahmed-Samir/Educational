@@ -10,80 +10,125 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
-APP_NAME = "CodeCraft Hub"
-APP_ICON = "🚀"
+APP_NAME = "CodeCraft Hub 🎒"
+APP_ICON = "🎓"
 ASSETS_DIR = Path(__file__).parent.parent / "assets"
 
 CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
 
 html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Nunito', sans-serif;
 }
 
-/* Header */
+/* Playful page background */
+.stApp {
+    background: linear-gradient(180deg, #FFFBEB 0%, #FFF7ED 45%, #FDF2F8 100%);
+}
+
+/* Header — classroom poster style */
 .app-header {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 6px 0 18px;
-    margin-bottom: 6px;
-    border-bottom: 1px solid #EDEBF7;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #FBBF24, #FB7185 60%, #A78BFA);
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(251, 146, 60, 0.25);
+    color: white;
 }
 .app-header-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #6C5CE7, #9B8CFB);
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.95);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 28px;
     flex-shrink: 0;
+    transform: rotate(-6deg);
 }
 .app-header-title {
-    font-size: 22px;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 26px;
     font-weight: 700;
     margin: 0;
     line-height: 1.2;
-    color: #1B1F23;
+    color: #FFFFFF;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 .app-header-subtitle {
     font-size: 14px;
-    color: #6B7280;
+    color: #FFF7ED;
     margin: 2px 0 0;
+    font-weight: 600;
 }
 
 /* Badges */
 .badge {
     display: inline-block;
-    padding: 3px 11px;
+    padding: 3px 12px;
     border-radius: 999px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 800;
     margin-right: 6px;
+    border: 2px solid rgba(255,255,255,0.7);
 }
 
-/* Cards (st.container(border=True)) feel a bit softer */
+/* Cards — sticker-like */
 div[data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius: 14px !important;
+    border-radius: 18px !important;
+    background: #FFFFFF !important;
+    border: 2px solid #FDE68A !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.12) !important;
 }
 
-/* Buttons: slightly bolder, friendlier */
+/* Buttons: chunky and fun */
 .stButton > button, .stFormSubmitButton > button, .stLinkButton > a {
-    border-radius: 10px !important;
-    font-weight: 600 !important;
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    border-bottom: 4px solid rgba(0,0,0,0.12) !important;
 }
 .stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"] {
-    box-shadow: 0 2px 10px rgba(108, 92, 231, 0.25);
+    background: linear-gradient(135deg, #F59E0B, #EF4444) !important;
+    color: white !important;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
 }
 
-/* Metrics */
+/* Metrics — score cards */
 div[data-testid="stMetric"] {
-    background: #F5F3FF;
-    border-radius: 14px;
+    background: #FFFFFF;
+    border: 2px dashed #FBBF24;
+    border-radius: 18px;
     padding: 14px 16px 10px;
+}
+
+/* Exam timer banner */
+.exam-timer {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    padding: 10px 16px;
+    border-radius: 16px;
+    background: #ECFDF5;
+    border: 2px solid #34D399;
+    color: #065F46;
+    margin: 8px 0;
+}
+.exam-timer.low {
+    background: #FEF2F2;
+    border-color: #F87171;
+    color: #991B1B;
+    animation: pulse 1.2s infinite;
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
 }
 </style>
 """
@@ -93,8 +138,13 @@ BADGE_COLORS = {
     "pdf": ("#FEF3C7", "#92400E"),
     "qa": ("#DBEAFE", "#1E40AF"),
     "article": ("#D1FAE5", "#065F46"),
-    "topic": ("#EEF2FF", "#4338CA"),
-    "type": ("#F5F3FF", "#6C5CE7"),
+    "topic": ("#E0E7FF", "#3730A3"),
+    "type": ("#FEF3C7", "#92400E"),
+    "chapter": ("#DDD6FE", "#5B21B6"),
+    "grade": ("#FEF3C7", "#92400E"),
+    "activity": ("#FCE7F3", "#9D174D"),
+    "assessment": ("#FFEDD5", "#9A3412"),
+    "slides": ("#E0F2FE", "#075985"),
     "correct": ("#D1FAE5", "#065F46"),
     "incorrect": ("#FEE2E2", "#991B1B"),
     "review": ("#FEF3C7", "#92400E"),
@@ -132,8 +182,32 @@ def render_header(subtitle: str = ""):
 
 def badge(text: str, kind: str = "type") -> str:
     """Small colored pill, e.g. badge('PDF', 'pdf') or badge('Loops', 'topic')."""
-    bg, color = BADGE_COLORS.get(kind, BADGE_COLORS["type"])
+    key = str(kind or "type").lower()
+    # Map messy manifest values ("PowerPoint", "PDF", "Q&A doc") to colors.
+    if "power" in key or "ppt" in key or "slide" in key:
+        key = "slides"
+    elif key == "pdf":
+        key = "pdf"
+    elif "activity" in key:
+        key = "activity"
+    elif "assess" in key:
+        key = "assessment"
+    bg, color = BADGE_COLORS.get(key, BADGE_COLORS.get(kind, BADGE_COLORS["type"]))
     return f'<span class="badge" style="background:{bg};color:{color};">{text}</span>'
+
+
+def timer_banner(remaining_sec: int, total_sec: int) -> None:
+    """Big playful countdown banner. Turns red + pulsing under 60s."""
+    mm = remaining_sec // 60
+    ss = remaining_sec % 60
+    cls = "exam-timer low" if remaining_sec <= 60 else "exam-timer"
+    emoji = "⏰" if remaining_sec > 60 else "🔥"
+    st.markdown(
+        f"<div class='{cls}'>{emoji} {mm:02d}:{ss:02d} left — keep going, you got this! 💪</div>",
+        unsafe_allow_html=True,
+    )
+    if total_sec > 0:
+        st.progress(max(0.0, min(1.0, remaining_sec / total_sec)))
 
 
 def embed_pdf(file_path: Path, height: int = 600):
