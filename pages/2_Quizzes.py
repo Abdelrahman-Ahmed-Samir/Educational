@@ -57,6 +57,17 @@ def clear_quiz_answers():
         del st.session_state[key]
 
 
+def clear_quiz_state():
+    """Drop all quiz progress/results (stage, score, review, answers).
+    Used when the signed-in account changes mid-state so one student can
+    never see another's exam or grade on a shared browser."""
+    for key in [
+        k for k in list(st.session_state.keys())
+        if k.startswith(("quiz_", "q_")) or k == "balloons_shown"
+    ]:
+        st.session_state.pop(key, None)
+
+
 def question_points(q: dict) -> int:
     """How many auto-gradable points a question is worth."""
     if q["type"] == "classify":
@@ -235,6 +246,13 @@ questions_by_topic = load_questions()
 if "quiz_stage" not in st.session_state:
     st.session_state.quiz_stage = "pick_topic"
 
+# Owner check: quiz progress/results belong to whoever started them. If the
+# account changed underneath (shared browser), drop the stale state so one
+# student never sees another's exam or grade.
+if st.session_state.get("quiz_owner") and st.session_state.quiz_owner != student_identity:
+    clear_quiz_state()
+    st.session_state.quiz_stage = "pick_topic"
+
 render_header("Pick a topic, beat the timer ⏰, and your score is saved automatically! 🎉")
 
 if not sheets_configured():
@@ -299,6 +317,7 @@ if st.session_state.quiz_stage == "pick_topic":
         limit_min = questions_by_topic[topic].get("time_limit_minutes")
         st.session_state.quiz_topic = topic
         st.session_state.quiz_stage = "taking"
+        st.session_state.quiz_owner = student_identity
         st.session_state.quiz_student_name = student_name.strip()
         st.session_state.quiz_time_limit_min = limit_min
         now = time.time()

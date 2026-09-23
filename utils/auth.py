@@ -239,7 +239,25 @@ def get_current_user() -> dict | None:
 
 
 def logout() -> None:
-    st.session_state.pop("user", None)
+    """Clear the user plus everything user-specific: quiz stage/score/
+    answers, AI chat history, admin temp passwords. Without this, a
+    second student signing in on the same browser would see the first
+    student's grades and chats (all Streamlit session_state survives
+    a bare 'pop user')."""
+    for k in list(st.session_state.keys()):
+        if (
+            k == "user"
+            or k.startswith(("quiz_", "q_"))
+            or k in {
+                "qa_history",
+                "balloons_shown",
+                "just_reset",
+                "teacher_pw",
+                "oauth_state",
+                "pending_google_user",
+            }
+        ):
+            st.session_state.pop(k, None)
 
 
 def require_login() -> dict:

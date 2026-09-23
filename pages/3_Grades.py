@@ -26,7 +26,7 @@ render_header("Live view of the class results sheet.")
 # Optional light gate so students landing on this page by URL can't see everyone's grades.
 teacher_password = st.secrets.get("app", {}).get("teacher_password")
 if teacher_password:
-    entered = st.text_input("Teacher password", type="password")
+    entered = st.text_input("Teacher password", type="password", key="teacher_pw")
     if entered != teacher_password:
         st.stop()
 
