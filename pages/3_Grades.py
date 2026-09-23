@@ -1,3 +1,4 @@
+import json
 import sys
 from pathlib import Path
 
@@ -6,11 +7,19 @@ import streamlit as st
 
 APP_DIR = Path(__file__).parent.parent
 sys.path.append(str(APP_DIR))
+from utils.auth import (  # noqa: E402
+    create_user,
+    list_users,
+    require_login,
+    reset_user_password,
+    set_user_active,
+)
 from utils.sheets import load_results, sheets_configured  # noqa: E402
-from utils.ui import apply_theme, badge, render_header  # noqa: E402
+from utils.ui import apply_theme, badge, render_header, render_review_items  # noqa: E402
 
 st.set_page_config(page_title="Grades", page_icon="📊")
 apply_theme()
+require_login()
 
 render_header("Live view of the class results sheet.")
 
@@ -155,6 +164,101 @@ st.dataframe(
     hide_index=True,
 )
 
+st.caption("🔍 Answer details — your answer vs correct, per attempt")
+for _, _row in sdf.sort_values("timestamp", ascending=False).iterrows():
+    _rj = _row.get("review_json", "") if "review_json" in sdf.columns else ""
+    _label = f"{_row.get('topic', 'Quiz')} — {_row.get('score', '?')}/{_row.get('total', '?')}"
+    with st.expander(_label):
+        if _rj:
+            try:
+                render_review_items(json.loads(_rj))
+            except Exception:
+                st.caption("Couldn't parse saved answers for this attempt.")
+        else:
+            st.caption("No answer detail recorded (attempt from before this feature).")
+
 st.divider()
 st.subheader("All attempts")
 st.dataframe(df, use_container_width=True, hide_index=True)
+
+st.divider()
+st.subheader("👥 Student accounts")
+st.caption(
+    "Create accounts, disable access, or reset passwords — same Users sheet "
+    "as `scripts/create_user.py`. Attempts per student come from the Results sheet."
+)
+
+with st.expander("➕ Create new account"):
+    with st.form("admin_create_user"):
+        nu = st.text_input("Username (e.g. ahmed01)")
+        nd = st.text_input("Display name (e.g. Ahmed Hassan)")
+        npw = st.text_input("Password (min 6 characters)", type="password")
+        if st.form_submit_button("Create account", type="primary"):
+            try:
+                create_user(nu, npw, nd)
+                st.success(f"Account '{nu.strip()}' created — share the password privately.")
+                st.rerun()
+            except ValueError as e:
+                st.error(str(e))
+            except Exception as e:  # noqa: BLE001
+                st.error(f"Couldn't create account: {e}")
+
+# Attempts per username (matches quiz saves, case-insensitive).
+_attempt_counts: dict[str, int] = {}
+try:
+    _names = df["student_name"].astype(str).str.strip().str.lower()
+    for _n in _names:
+        if _n:
+            _attempt_counts[_n] = _attempt_counts.get(_n, 0) + 1
+except Exception:
+    pass
+
+
+def _attempts_for(username: str, display: str) -> int:
+    return _attempt_counts.get(str(username or "").strip().lower(), 0) + (
+        _attempt_counts.get(str(display or "").strip().lower(), 0)
+        if str(display or "").strip().lower() != str(username or "").strip().lower()
+        else 0
+    )
+
+
+users = list_users()
+if not users:
+    st.info("No accounts yet — create the first one above (don't forget your own teacher account).")
+else:
+    for u in users:
+        uname = str(u.get("username", ""))
+        disp = str(u.get("display_name", "") or uname)
+        active = str(u.get("active", "TRUE")).strip().upper() not in ("FALSE", "0", "NO", "")
+        with st.container(border=True):
+            c1, c2 = st.columns([3, 2])
+            with c1:
+                st.markdown(
+                    f"**{disp}**  {badge('ACTIVE' if active else 'DISABLED', 'correct' if active else 'incorrect')}  \n"
+                    f"`{uname}` · {_attempts_for(uname, disp)} attempts",
+                    unsafe_allow_html=True,
+                )
+            with c2:
+                if st.button(
+                    "Disable" if active else "Enable",
+                    key=f"toggle_{uname}",
+                    use_container_width=True,
+                ):
+                    try:
+                        set_user_active(uname, not active)
+                        st.rerun()
+                    except Exception as e:  # noqa: BLE001
+                        st.error(f"Couldn't update: {e}")
+                if st.button("Reset password", key=f"reset_{uname}", use_container_width=True):
+                    try:
+                        temp = reset_user_password(uname)
+                        st.session_state["just_reset"] = (uname, temp)
+                        st.rerun()
+                    except Exception as e:  # noqa: BLE001
+                        st.error(f"Couldn't reset: {e}")
+    jr = st.session_state.pop("just_reset", None)
+    if jr:
+        st.success(
+            f"New temp password for **{jr[0]}**: `{jr[1]}` — copy it now, "
+            "it won't be shown again. Share it privately."
+        )

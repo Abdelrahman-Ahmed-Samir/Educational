@@ -37,7 +37,10 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive",
 ]
 
-HEADER = ["timestamp", "student_name", "topic", "score", "total", "open_ended_notes"]
+HEADER = ["timestamp", "student_name", "topic", "score", "total", "open_ended_notes", "review_json"]
+# Header before review_json existed — upgraded in place (see _get_worksheet)
+# so pre-existing sheets keep old rows aligned instead of shifting.
+HEADER_V1 = ["timestamp", "student_name", "topic", "score", "total", "open_ended_notes"]
 
 
 @st.cache_resource(show_spinner=False)
@@ -63,9 +66,14 @@ def _get_worksheet():
     # The worksheet already existed (e.g. created manually, or created before
     # this check existed) — make sure row 1 is actually the expected header,
     # inserting it above any existing data if it's missing or wrong.
+    # Sheets created before review_json existed get their header upgraded
+    # in place (old rows simply have an empty review_json cell).
     first_row = ws.row_values(1)
     if first_row != HEADER:
-        ws.insert_row(HEADER, index=1)
+        if first_row == HEADER_V1:
+            ws.update("1:1", [HEADER])
+        else:
+            ws.insert_row(HEADER, index=1)
 
     return ws
 
@@ -76,12 +84,19 @@ def sheets_configured() -> bool:
 
 
 def record_result(
-    student_name: str, topic: str, score: int, total: int, open_ended_notes: str = ""
+    student_name: str,
+    topic: str,
+    score: int,
+    total: int,
+    open_ended_notes: str = "",
+    review_json: str = "",
 ) -> None:
     """Append one quiz attempt as a new row in the sheet.
 
     `open_ended_notes` holds any free-text answers (essay/analysis questions)
     that aren't auto-graded, so the teacher can review them in the sheet.
+    `review_json` holds the serialized per-question review (your answer vs
+    correct answer) shown to teachers in the Grades page expanders.
     """
     ws = _get_worksheet()
     ws.append_row([
@@ -91,6 +106,7 @@ def record_result(
         score,
         total,
         open_ended_notes,
+        review_json,
     ])
 
 

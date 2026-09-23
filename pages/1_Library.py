@@ -6,10 +6,12 @@ import streamlit as st
 
 APP_DIR = Path(__file__).parent.parent
 sys.path.append(str(APP_DIR))
+from utils.auth import require_login  # noqa: E402
 from utils.ui import APP_ICON, apply_theme, badge, embed_pdf, render_header  # noqa: E402
 
 st.set_page_config(page_title="Library", page_icon="📚")
 apply_theme()
+require_login()
 
 RESOURCES_DIR = APP_DIR / "resources"
 MANIFEST_PATH = RESOURCES_DIR / "manifest.json"

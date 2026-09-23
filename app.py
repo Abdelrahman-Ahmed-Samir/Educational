@@ -4,10 +4,12 @@ from pathlib import Path
 import streamlit as st
 
 from utils.announcements import get_announcements
+from utils.auth import require_login
 from utils.ui import APP_ICON, APP_NAME, apply_theme, badge, render_header
 
 st.set_page_config(page_title=APP_NAME, page_icon=APP_ICON, layout="centered")
 apply_theme()
+user = require_login()
 
 RESOURCES_PATH = Path(__file__).parent / "resources" / "manifest.json"
 QUIZZES_DIR = Path(__file__).parent / "quizzes"

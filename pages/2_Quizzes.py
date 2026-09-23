@@ -7,8 +7,9 @@ import streamlit as st
 
 APP_DIR = Path(__file__).parent.parent
 sys.path.append(str(APP_DIR))
+from utils.auth import get_current_user, require_login  # noqa: E402
 from utils.sheets import count_attempts, record_result, sheets_configured  # noqa: E402
-from utils.ui import apply_theme, badge, render_header, timer_banner  # noqa: E402
+from utils.ui import apply_theme, badge, render_header, render_review_items, timer_banner  # noqa: E402
 
 try:
     from streamlit_autorefresh import st_autorefresh
@@ -17,6 +18,10 @@ except ImportError:
 
 st.set_page_config(page_title="Quizzes", page_icon="📝")
 apply_theme()
+require_login()
+user = get_current_user() or {}
+student_identity = (user.get("username") or "").strip().lower()
+student_display = user.get("display_name") or user.get("username") or "you"
 
 QUIZZES_DIR = APP_DIR / "quizzes"
 
@@ -203,12 +208,17 @@ def finalize_quiz(topic: str, data: dict, total_points: int, timed_out: bool = F
 
     if sheets_configured():
         try:
+            try:
+                _review_json = json.dumps(review_items, ensure_ascii=False)
+            except (TypeError, ValueError):
+                _review_json = ""
             record_result(
                 st.session_state.quiz_student_name,
                 topic,
                 score,
                 total_points,
                 st.session_state.quiz_open_notes,
+                _review_json,
             )
             st.session_state.quiz_synced = True
         except Exception as e:  # noqa: BLE001
@@ -218,30 +228,6 @@ def finalize_quiz(topic: str, data: dict, total_points: int, timed_out: bool = F
         st.session_state.quiz_synced = False
 
     st.session_state.quiz_stage = "result"
-
-
-def render_review_items(review_items: list) -> None:
-    """Student-facing answer review: every question with YOUR answer and
-    the CORRECT answer side by side. Reused on the result screen and in
-    the 'review last attempt' expander on the quiz list."""
-    status_labels = {"correct": "Correct", "incorrect": "Incorrect", "review": "Needs review"}
-    for i, item in enumerate(review_items or []):
-        with st.container(border=True):
-            st.markdown(
-                f"{badge(status_labels.get(item.get('status', ''), 'review'), item.get('status', 'review'))}",
-                unsafe_allow_html=True,
-            )
-            st.markdown(f"**Q{i + 1}.** {item.get('question', '')}")
-
-            if "sub_lines" in item:
-                for line in item["sub_lines"]:
-                    st.markdown(line)
-            elif item.get("status") == "review":
-                st.markdown(f"✏️ Your answer: {item.get('your_answer', '')}")
-                st.caption(f"Model answer (for self-checking): {item.get('correct_answer', '')}")
-            else:
-                st.markdown(f"✏️ Your answer: **{item.get('your_answer', '')}**")
-                st.markdown(f"✅ Correct answer: **{item.get('correct_answer', '')}**")
 
 
 questions_by_topic = load_questions()
@@ -274,8 +260,16 @@ if st.session_state.quiz_stage == "pick_topic":
         if st.session_state.get("quiz_review"):
             with st.expander("📖 Review my last answers (your answer vs correct answer)"):
                 render_review_items(st.session_state.get("quiz_review", []))
-    student_name = st.text_input("Your name", key="student_name")
+    student_name = student_identity
+    st.caption(f"Logged in as **{student_display}** — score saves under this account.")
     topic = st.selectbox("Topic", list(questions_by_topic.keys()))
+
+    if sheets_configured():
+        try:
+            _prev = count_attempts(student_name.strip(), topic)
+            st.caption(f"📝 You have taken this quiz {_prev} time(s) before.")
+        except Exception:
+            pass
 
     _preview = questions_by_topic[topic]
     _limit = _preview.get("time_limit_minutes")
@@ -299,26 +293,23 @@ if st.session_state.quiz_stage == "pick_topic":
             st.caption(f"Attempt {attempts_used + 1} of {max_attempts}.")
 
     if st.button("Start exam 🚀", type="primary", disabled=limit_reached):
-        if not student_name.strip():
-            st.error("Enter your name first.")
-        else:
-            clear_quiz_answers()
-            for _k in ("quiz_ticker", "quiz_timed_out"):
-                st.session_state.pop(_k, None)
-            limit_min = questions_by_topic[topic].get("time_limit_minutes")
-            st.session_state.quiz_topic = topic
-            st.session_state.quiz_stage = "taking"
-            st.session_state.quiz_student_name = student_name.strip()
-            st.session_state.quiz_time_limit_min = limit_min
-            now = time.time()
-            st.session_state.quiz_start_ts = now
-            try:
-                total_sec = int(float(limit_min) * 60) if limit_min else 0
-            except (TypeError, ValueError):
-                total_sec = 0
-            st.session_state.quiz_deadline_ts = now + total_sec if total_sec > 0 else None
-            st.session_state.quiz_timed_out = False
-            st.rerun()
+        clear_quiz_answers()
+        for _k in ("quiz_ticker", "quiz_timed_out"):
+            st.session_state.pop(_k, None)
+        limit_min = questions_by_topic[topic].get("time_limit_minutes")
+        st.session_state.quiz_topic = topic
+        st.session_state.quiz_stage = "taking"
+        st.session_state.quiz_student_name = student_name.strip()
+        st.session_state.quiz_time_limit_min = limit_min
+        now = time.time()
+        st.session_state.quiz_start_ts = now
+        try:
+            total_sec = int(float(limit_min) * 60) if limit_min else 0
+        except (TypeError, ValueError):
+            total_sec = 0
+        st.session_state.quiz_deadline_ts = now + total_sec if total_sec > 0 else None
+        st.session_state.quiz_timed_out = False
+        st.rerun()
 
 # ---- Stage 2: take the exam (with countdown timer) ----
 elif st.session_state.quiz_stage == "taking":

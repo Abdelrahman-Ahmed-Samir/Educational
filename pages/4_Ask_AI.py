@@ -5,11 +5,13 @@ import streamlit as st
 
 APP_DIR = Path(__file__).parent.parent
 sys.path.append(str(APP_DIR))
+from utils.auth import require_login  # noqa: E402
 from utils.qa import ai_configured, answer_question  # noqa: E402
 from utils.ui import apply_theme, render_header  # noqa: E402
 
 st.set_page_config(page_title="Ask AI", page_icon="🤖")
 apply_theme()
+require_login()
 
 render_header("Ask about the class resources in English or Arabic — answered any time! 🤖")
 

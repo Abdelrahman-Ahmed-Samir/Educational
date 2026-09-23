@@ -226,3 +226,28 @@ def embed_pdf(file_path: Path, height: int = 600):
         f'style="border:1px solid #E3E1DA; border-radius:8px;">',
         height=height,
     )
+
+
+def render_review_items(review_items: list) -> None:
+    """Student-facing answer review: every question with YOUR answer and
+    the CORRECT answer side by side. Shared by the quiz result screen,
+    the quiz-list 'review last attempt' expander, and the teacher Grades
+    page (which renders saved snapshots from the sheet)."""
+    status_labels = {"correct": "Correct", "incorrect": "Incorrect", "review": "Needs review"}
+    for i, item in enumerate(review_items or []):
+        with st.container(border=True):
+            st.markdown(
+                f"{badge(status_labels.get(item.get('status', ''), 'review'), item.get('status', 'review'))}",
+                unsafe_allow_html=True,
+            )
+            st.markdown(f"**Q{i + 1}.** {item.get('question', '')}")
+
+            if "sub_lines" in item:
+                for line in item["sub_lines"]:
+                    st.markdown(line)
+            elif item.get("status") == "review":
+                st.markdown(f"✏️ Your answer: {item.get('your_answer', '')}")
+                st.caption(f"Model answer (for self-checking): {item.get('correct_answer', '')}")
+            else:
+                st.markdown(f"✏️ Your answer: **{item.get('your_answer', '')}**")
+                st.markdown(f"✅ Correct answer: **{item.get('correct_answer', '')}**")
