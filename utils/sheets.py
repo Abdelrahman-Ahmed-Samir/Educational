@@ -38,9 +38,10 @@ SCOPES = [
 ]
 
 HEADER = ["timestamp", "student_name", "topic", "score", "total", "open_ended_notes", "review_json"]
-# Header before review_json existed — upgraded in place (see _get_worksheet)
-# so pre-existing sheets keep old rows aligned instead of shifting.
+# Older headers — upgraded/downgraded in place (see _get_worksheet) so
+# pre-existing sheets keep old rows aligned instead of shifting.
 HEADER_V1 = ["timestamp", "student_name", "topic", "score", "total", "open_ended_notes"]
+HEADER_WITH_NOTE = ["timestamp", "student_name", "topic", "score", "total", "open_ended_notes", "review_json", "teacher_note"]
 
 
 @st.cache_resource(show_spinner=False)
@@ -67,11 +68,15 @@ def _get_worksheet():
     # this check existed) — make sure row 1 is actually the expected header,
     # inserting it above any existing data if it's missing or wrong.
     # Sheets created before review_json existed get their header upgraded
-    # in place (old rows simply have an empty review_json cell).
+    # in place (old rows simply have an empty review_json cell). Sheets that
+    # briefly had the removed teacher_note column get it trimmed the same way
+    # (row data untouched — manual score edits stay).
     first_row = ws.row_values(1)
     if first_row != HEADER:
-        if first_row == HEADER_V1:
+        if first_row == HEADER_V1 or first_row == HEADER_WITH_NOTE:
             ws.update("1:1", [HEADER])
+            for _c in range(len(HEADER) + 1, len(first_row) + 1):
+                ws.update_cell(1, _c, "")
         else:
             ws.insert_row(HEADER, index=1)
 

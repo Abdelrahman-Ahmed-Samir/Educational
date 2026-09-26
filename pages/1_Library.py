@@ -170,7 +170,8 @@ for r in filtered:
 
         if "url" in r:
             if r["type"] == "video":
-                st.video(r["url"])
+                st.link_button("▶ Watch on Google Drive (opens in a new tab)", r["url"])
+                st.caption("Plays on Google Drive — use your Gmail if it asks you to sign in.")
             else:
                 st.link_button("Open (opens in a new tab)", r["url"])
                 st.caption("External articles can't be shown inline — most sites block embedding.")

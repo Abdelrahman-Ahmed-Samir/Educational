@@ -9,10 +9,13 @@ APP_DIR = Path(__file__).parent.parent
 sys.path.append(str(APP_DIR))
 from utils.auth import (  # noqa: E402
     create_user,
+    get_video_access,
     list_users,
+    load_video_catalog,
     require_login,
     reset_user_password,
     set_user_active,
+    set_video_access,
 )
 from utils.sheets import load_results, sheets_configured  # noqa: E402
 from utils.ui import apply_theme, badge, render_header, render_review_items  # noqa: E402
@@ -223,6 +226,8 @@ def _attempts_for(username: str, display: str) -> int:
 
 
 users = list_users()
+_video_catalog = load_video_catalog()
+_video_titles = {str(v.get("id", "")).strip().lower(): v.get("title", v.get("id", "")) for v in _video_catalog}
 if not users:
     st.info("No accounts yet — create the first one above (don't forget your own teacher account).")
 else:
@@ -256,6 +261,22 @@ else:
                         st.rerun()
                     except Exception as e:  # noqa: BLE001
                         st.error(f"Couldn't reset: {e}")
+            if _video_titles:
+                _current_vids = sorted(get_video_access(uname))
+                _sel = st.multiselect(
+                    "🎥 Paid recordings this student can watch",
+                    options=sorted(_video_titles.keys()),
+                    default=[v for v in _current_vids if v in _video_titles],
+                    format_func=lambda vid: _video_titles.get(vid, vid),
+                    key=f"vids_{uname}",
+                )
+                if st.button("Save recordings", key=f"svids_{uname}"):
+                    try:
+                        set_video_access(uname, _sel)
+                        st.success(f"Recordings updated for {disp}.")
+                        st.rerun()
+                    except Exception as e:  # noqa: BLE001
+                        st.error(f"Couldn't save: {e}")
     jr = st.session_state.pop("just_reset", None)
     if jr:
         st.success(

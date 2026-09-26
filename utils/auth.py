@@ -24,13 +24,19 @@ check on top of this.
 from __future__ import annotations
 
 import hashlib
+import json
 import secrets as py_secrets
 from datetime import datetime
+from pathlib import Path
 
 import streamlit as st
 
+APP_DIR = Path(__file__).parent.parent
+VIDEOS_MANIFEST = APP_DIR / "videos" / "manifest.json"
+
 USERS_WORKSHEET = "Users"
-USERS_HEADER = ["username", "display_name", "password_hash", "active", "created_at"]
+USERS_HEADER = ["username", "display_name", "password_hash", "active", "created_at", "video_access"]
+USERS_HEADER_V1 = ["username", "display_name", "password_hash", "active", "created_at"]
 
 _ITERATIONS = 200_000
 
@@ -133,19 +139,29 @@ def user_count() -> int:
 # ---------- teacher user management (used by Grades admin panel) ----------
 
 def _get_users_ws():
-    """Users worksheet, created on first use."""
+    """Users worksheet, created on first use. Adds the video_access column
+    to sheets created before paid recordings existed."""
     from utils.sheets import _get_client
 
     client = _get_client()
     spreadsheet = client.open(st.secrets["sheet"]["name"])
     try:
-        return spreadsheet.worksheet(USERS_WORKSHEET)
+        ws = spreadsheet.worksheet(USERS_WORKSHEET)
     except Exception:
         ws = spreadsheet.add_worksheet(
             title=USERS_WORKSHEET, rows=500, cols=len(USERS_HEADER)
         )
         ws.append_row(USERS_HEADER)
         return ws
+    try:
+        first = ws.row_values(1)
+        if not first:
+            ws.append_row(USERS_HEADER)
+        elif first == USERS_HEADER_V1:
+            ws.update("1:1", [USERS_HEADER])
+    except Exception:
+        pass
+    return ws
 
 
 def _user_row(ws, username: int | str) -> int | None:
@@ -184,6 +200,7 @@ def create_user(username: str, password: str, display_name: str = "") -> None:
         hash_password(password),
         "TRUE",
         datetime.now().isoformat(timespec="seconds"),
+        "",
     ])
     _load_users.clear()
 
@@ -227,6 +244,37 @@ def change_password(username: str, current_password: str, new_password: str) -> 
     ws.update_cell(r, 3, hash_password(new_password))
     _load_users.clear()
     return True
+
+
+# ---------- paid recordings access ----------
+
+def load_video_catalog() -> list[dict]:
+    """Paid recordings from videos/manifest.json (outside the AI-indexed
+    resources, so adding videos never invalidates embeddings)."""
+    if not VIDEOS_MANIFEST.exists():
+        return []
+    try:
+        data = json.loads(VIDEOS_MANIFEST.read_text(encoding="utf-8"))
+        return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
+def get_video_access(username: str) -> set[str]:
+    """Video ids this user may watch (from the Users sheet's video_access
+    column — comma-separated ids, e.g. 'ch1-l1,ch1-l2-p1')."""
+    row = _find_user(username)
+    raw = str((row or {}).get("video_access", "") or "")
+    return {p.strip().lower() for p in raw.split(",") if p.strip()}
+
+
+def set_video_access(username: str, video_ids: list[str] | set[str]) -> None:
+    ws = _get_users_ws()
+    row = _user_row(ws, username)
+    if row is None:
+        raise ValueError(f"User '{username}' not found.")
+    ws.update_cell(row, 6, ",".join(sorted({str(v).strip().lower() for v in video_ids if str(v).strip()})))
+    _load_users.clear()
 
 
 # ---------- public API used by pages ----------

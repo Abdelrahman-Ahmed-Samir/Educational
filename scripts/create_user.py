@@ -26,7 +26,7 @@ APP_DIR = Path(__file__).parent.parent
 SECRETS_PATH = APP_DIR / ".streamlit" / "secrets.toml"
 
 USERS_WORKSHEET = "Users"
-USERS_HEADER = ["username", "display_name", "password_hash", "active", "created_at"]
+USERS_HEADER = ["username", "display_name", "password_hash", "active", "created_at", "video_access"]
 _ITERATIONS = 200_000
 
 
@@ -76,6 +76,7 @@ def main(argv: list[str]) -> None:
     ws.append_row([
         username, display, hash_password(password), "TRUE",
         datetime.now().isoformat(timespec="seconds"),
+        "",
     ])
     print(f"Added '{username}' ({display}). Share the password privately.")
 
